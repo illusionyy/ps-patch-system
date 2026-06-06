@@ -114,5 +114,7 @@ static int install_shortcut(const char* title_id, const char* url, const char* f
 
 int install_launcher(void)
 {
-    return install_shortcut("ILNY26228", "http://127.0.0.1:" xstr(WEB_PORT), "Patch Manager");
+    install_shortcut("ILNY26228", "http://127.0.0.1:" xstr(WEB_PORT), "Patch Manager");
+    install_shortcut("ILNY26229", "https://idlesauce.github.io/umtx2", "idlesauce umtx2 host");
+    return 0;
 }
