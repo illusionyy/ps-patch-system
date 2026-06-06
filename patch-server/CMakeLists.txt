@@ -4,7 +4,10 @@ project(${PROJECT_NAME})
 
 include(setup-tools)
 
-include_directories(../extern/reader/pugixml/pugixml/src)
+include_directories(
+        ../extern/reader/pugixml/pugixml/src
+        ../extern/hook/minhook/minhook/src/hde
+)
 
 add_compile_definitions(ELF_NAME="${PROJECT_NAME}.elf")
 add_executable(${PROJECT_NAME}
@@ -26,6 +29,7 @@ target_link_libraries(${PROJECT_NAME}
         PRIVATE
         pugixml
         SceSystemService
+        hde
         shared
 )
 

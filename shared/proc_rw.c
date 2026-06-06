@@ -107,7 +107,7 @@ static unsigned long virt2phys(unsigned long cr3, unsigned long va, unsigned lon
 
         if (!(cr3 & X86_PG_V))
         {  // not present/valid
-            return -1;
+            return -(__LINE__);
         }
         if ((cr3 & X86_PG_PS) || i == 12)
         {                                       // large page or last level
@@ -133,14 +133,14 @@ static int phys_copy_to_remote(unsigned long cr3, const void* from_local_vaddr, 
     unsigned long kernel_dmap_base = kernel_get_dmap_base();
     if (kernel_dmap_base == 0)
     {
-        return -1;
+        return -(__LINE__);
     }
     while (len)
     {
         phys = virt2phys(cr3, to_remote_vaddr, &phys_end);
         if (phys == -1)
         {
-            return -1;
+            return -(__LINE__);
         }
         size_t chk = phys_end - phys;
         if (len < chk)
@@ -150,7 +150,7 @@ static int phys_copy_to_remote(unsigned long cr3, const void* from_local_vaddr, 
 
         if (kernel_copyin(p_src, kernel_dmap_base + phys, chk))
         {
-            return -1;
+            return -(__LINE__);
         }
 
         to_remote_vaddr += chk;
@@ -160,6 +160,8 @@ static int phys_copy_to_remote(unsigned long cr3, const void* from_local_vaddr, 
     return 0;
 }
 #endif
+
+#include "memory.h"
 
 int userland_copyin_(pid_t pid, const void* buf, intptr_t addr, size_t len, const char* user)
 {
@@ -185,20 +187,20 @@ int userland_copyin_(pid_t pid, const void* buf, intptr_t addr, size_t len, cons
     void* tmp = malloc(len);
     if (tmp == NULL)
     {
-        return -1;
+        return -(__LINE__);
     }
 
     int res = userland_copyout(pid, addr, tmp, len);
     free(tmp);
     if (res)
     {
-        return -1;
+        return -(__LINE__);
     }
 
     unsigned long cr3 = kernel_get_proc_cr3(pid);
     if (cr3 == 0)
     {
-        return -1;
+        return -(__LINE__);
     }
 
     return phys_copy_to_remote(cr3, buf, addr, len);

@@ -13,3 +13,6 @@
 [submodule "extern/compressor/fast-lzma2/fast-lzma2"]
 	path = extern/compressor/fast-lzma2/fast-lzma2
 	url = https://github.com/conor42/fast-lzma2.git
+[submodule "extern/hook/minhook/minhook"]
+	path = extern/hook/minhook/minhook
+	url = https://github.com/illusionyy/minhook.git

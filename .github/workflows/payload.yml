@@ -182,9 +182,15 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
+        ps5_tar="patch-prospero.tar"
+        python3 tar.py $ps5_tar \
+        build_ps5/patch-bundle-loader/patch-bundle-loader-prospero.elf \
+        build_ps5/patch-dmem/patch-dmem-prospero.elf \
+        build_ps5/patch-bapm/patch-bapm-prospero.elf
         gh release create "${{ github.run_id }}" \
         build_ps4/patch-bundle/patch-bundle-orbis.elf \
         build_ps5/patch-bundle/patch-bundle-prospero.elf \
         build_ps4/patch-bundle-loader/patch-bundle-loader-orbis.elf \
         build_ps5/patch-bundle-loader/patch-bundle-loader-prospero.elf \
+        $ps5_tar \
         --target "${{ GITHUB.SHA }}" -t "${{ github.run_id }}" -p
