@@ -28,5 +28,5 @@ __END_DECLS
 #define userland_getchar(p, a) userland_getchar_(p, a, FILE_FUNC_LINE)
 
 #define userland_copyout(p, a, b, l) userland_copyout_(p, a, b, l, FILE_FUNC_LINE)
-#define userland_copyin2(p, a, b, l) userland_copyin(p, b, a, l)
 #define userland_copyin(p, b, a, l) userland_copyin_(p, b, a, l, FILE_FUNC_LINE)
+#define userland_copyin2(p, a, b, l) userland_copyin(p, b, a, l)

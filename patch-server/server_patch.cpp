@@ -154,6 +154,17 @@ static void do_120hz_patch(const pid_t pid, dynlib_list& info_list, patch_120hz:
 }
 #endif
 
+static void run_videoout_patch(const pid_t pid, const dynlib_info& info)
+{
+#if defined(__PROSPERO__)
+    const uintptr_t mapbase = info.obj.mapbase;
+    static const uint8_t p[] = {0x31, 0xc0, 0xc3};
+    // TODO: only for demo, make this a pattern
+    userland_copyin2(pid, mapbase + 0x000086c0, p, sizeof(p));
+#endif
+    // TODO: Add fliprate patch
+}
+
 static void run_prx_load_patch(const client_data& read_client, const uint32_t id_h)
 {
     uint32_t modules[256] = {};
@@ -194,6 +205,7 @@ static void run_prx_load_patch(const client_data& read_client, const uint32_t id
                                 }
                                 case sid("libSceVideoOut.sprx"):
                                 {
+                                    run_videoout_patch(read_client.clientPid, info);
                                     break;
                                 }
                             }
