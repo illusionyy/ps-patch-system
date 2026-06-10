@@ -1,0 +1,16 @@
+if(DEFINED PAYLOAD_DEPLOY)  
+    set(PROG_DEPLOY ${PAYLOAD_DEPLOY})
+    #message(STATUS "PROG_DEPLOY: ${PROG_DEPLOY}")  
+else()
+    message(FATAL_ERROR "PAYLOAD_DEPLOY not set")
+endif()
+
+if(DEFINED ORBIS)
+    set(PLATFORM orbis)
+elseif(DEFINED PROSPERO)
+    set(PLATFORM prospero)
+else()
+    message(FATAL_ERROR "Unsupported platform")
+endif()
+
+include(c-standard)

@@ -1,0 +1,190 @@
+name: Payload
+
+on:
+  push:
+    paths:
+      - ".github/workflows/payload.yml"
+      - "**/*.c*"
+      - "**/*.h*"
+      - "**/*.py"
+      - "**/*.sh"
+      - "data/**"
+      - "**/CMakeLists.txt"
+  pull_request:
+    paths:
+      - ".github/workflows/payload.yml"
+      - "**/*.c*"
+      - "**/*.h*"
+      - "**/*.py"
+      - "**/*.sh"
+      - "data/**"
+      - "**/CMakeLists.txt"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.event_name  }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+
+    - name: Tell tools version
+      run: |
+        clang -v
+        cmake --version
+
+    - name: Set environment variables
+      run: |
+        echo "PS4_PAYLOAD_SDK=${{ runner.tool_cache }}/opt/ps4-payload-sdk" >> ${{ github.env }}
+        echo "PS5_PAYLOAD_SDK=${{ runner.tool_cache }}/opt/ps5-payload-sdk" >> ${{ github.env }}
+
+    - name: Install PS4 SDK
+      run: |
+        p="${{ env.PS4_PAYLOAD_SDK }}"
+        mkdir -p "$p"
+        curl -sL https://github.com/ps4-payload-dev/pacbrew/releases/latest/download/ps4-payload-dev.tar.gz | tar xz -C "$(realpath "$p/../../")"
+        ls $p
+
+    - name: Install PS5 SDK
+      run: |
+        p="${{ env.PS5_PAYLOAD_SDK }}"
+        mkdir -p "$p"
+        curl -sL https://github.com/ps5-payload-dev/pacbrew-repo/releases/latest/download/ps5-payload-dev.tar.gz | tar xz -C "$(realpath "$p/../../")"
+        ls $p
+
+    - name: Checkout Update PS4 SDK
+      uses: actions/checkout@main
+      with:
+        repository: ps4-payload-dev/sdk
+
+    - name: Install update PS4 SDK
+      run: make "DESTDIR=${{ env.PS4_PAYLOAD_SDK }}" clean install -j "$(nproc)"
+
+    - name: Checkout Update PS5 SDK
+      uses: actions/checkout@main
+      with:
+        repository: ps5-payload-dev/sdk
+
+    - name: Install update PS5 SDK
+      run: make "DESTDIR=${{ env.PS5_PAYLOAD_SDK }}" clean install -j "$(nproc)"
+
+    - name: Checkout Payload
+      uses: actions/checkout@main
+      with:
+        lfs: true
+        submodules: recursive
+
+    - name: Fix /usr/local permissions
+      run: sudo chown $USER:$USER /usr/local/lib /usr/local/include
+
+    - name: Cache Keystone
+      id: cache-keystone
+      uses: actions/cache@main
+      with:
+        path: |
+          /usr/local/lib/libkeystone*
+          /usr/local/include/keystone
+        key: keystone-${{ runner.os }}-${{ hashFiles('**/keystone/**') }}
+        restore-keys: keystone-${{ runner.os }}
+
+    - name: Cache Zydis
+      id: cache-zydis
+      uses: actions/cache@main
+      with:
+        path: |
+          /usr/local/lib/libZydis*
+          /usr/local/lib/libZycore*
+          /usr/local/include/Zydis
+          /usr/local/include/Zycore
+        key: zydis-${{ runner.os }}-${{ hashFiles('**/zydis/**') }}
+        restore-keys: zydis-${{ runner.os }}
+
+    - name: Setup Shellcode Build
+      working-directory: host
+      if: steps.cache-keystone.outputs.cache-hit != 'true' || steps.cache-zydis.outputs.cache-hit != 'true'
+      run: |
+        o="$PWD"
+        b="build"
+        if [ "${{ steps.cache-keystone.outputs.cache-hit }}" != "true" ]; then
+          cd "$o"
+          git clone https://github.com/imheresamir/keystone --depth 1
+          cd "$o/keystone"
+          mkdir $b && cd $b
+          ../make-lib.sh lib_only
+          sudo make install
+        fi
+        if [ "${{ steps.cache-zydis.outputs.cache-hit }}" != "true" ]; then
+          cd "$o"
+          git clone https://github.com/zyantific/zydis.git --depth 1 --recursive
+          cd "$o/zydis"
+          cmake -B $b
+          cmake --build $b
+          cd $b
+          sudo make install
+          cd "$o/zydis/dependencies/zycore"
+          cmake -B $b
+          cmake --build $b
+          cd $b
+          sudo make install
+        fi
+
+    - name: Build shellcode
+      run: bash host/shellcode_build.sh
+
+    - name: Diff
+      run: git diff > a && cat a && rm a
+
+    - name: Build PS4 Payloads
+      run: |
+        p="$PWD" # define p so it can be copypasted into shell
+        b="$p/build_ps4"
+        $PS4_PAYLOAD_SDK/bin/orbis-cmake -B "$b" -DCMAKE_VERBOSE_MAKEFILE=OFF --fresh
+        $PS4_PAYLOAD_SDK/bin/orbis-cmake --build "$b" -j "$(nproc)"
+
+    - name: Build PS5 Payloads
+      run: |
+        p="$PWD" # define p so it can be copypasted into shell
+        b="$p/build_ps5"
+        $PS5_PAYLOAD_SDK/bin/prospero-cmake -B "$b" -DCMAKE_VERBOSE_MAKEFILE=OFF --fresh
+        $PS5_PAYLOAD_SDK/bin/prospero-cmake --build "$b" -j "$(nproc)"
+
+    - name: Upload Shellcode Sources
+      uses: actions/upload-artifact@main
+      with:
+        name: Shellcode Sources
+        path: |
+          host/*.txt
+          ./**/*.gen.txt
+          patch/shellcore_onNewProcess.h
+          patch-server/usermode_prx_load.h
+
+    - name: Upload patch-bundle-orbis
+      if: 0
+      uses: actions/upload-artifact@main
+      with:
+        name: patch-bundle-orbis
+        path: build_ps4/patch-bundle-loader/patch-bundle-loader-orbis.elf
+        archive: false
+
+    - name: Upload patch-bundle-prospero
+      if: 0
+      uses: actions/upload-artifact@main
+      with:
+        name: patch-bundle-prospero
+        path: build_ps5/patch-bundle-loader/patch-bundle-loader-prospero.elf
+        archive: false
+
+    - name: Upload release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release create "${{ github.run_id }}" \
+        build_ps4/patch-bundle/patch-bundle-orbis.elf \
+        build_ps5/patch-bundle/patch-bundle-prospero.elf \
+        build_ps4/patch-bundle-loader/patch-bundle-loader-orbis.elf \
+        build_ps5/patch-bundle-loader/patch-bundle-loader-prospero.elf \
+        --target "${{ GITHUB.SHA }}" -t "${{ github.run_id }}" -p

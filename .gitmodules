@@ -1,0 +1,15 @@
+[submodule "extern/reader/pugixml/pugixml"]
+	path = extern/reader/pugixml/pugixml
+	url = https://github.com/zeux/pugixml.git
+[submodule "extern/web/materialize"]
+	path = extern/web/materialize
+	url = https://github.com/materializecss/materialize.git
+[submodule "extern/loader/prospero-elfldr/prospero-elfldr"]
+	path = extern/loader/prospero-elfldr/prospero-elfldr
+	url = https://github.com/ps5-payload-dev/elfldr.git
+[submodule "extern/loader/orbis-elfldr/orbis-elfldr"]
+	path = extern/loader/orbis-elfldr/orbis-elfldr
+	url = https://github.com/ps4-payload-dev/elfldr.git
+[submodule "extern/compressor/fast-lzma2/fast-lzma2"]
+	path = extern/compressor/fast-lzma2/fast-lzma2
+	url = https://github.com/conor42/fast-lzma2.git

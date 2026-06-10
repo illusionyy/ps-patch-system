@@ -1,0 +1,5 @@
+*.png filter=lfs diff=lfs merge=lfs -text
+*.woff2 filter=lfs diff=lfs merge=lfs -text
+patch-server/usermode_prx_load.h linguist-generated
+patch/shellcore_onNewProcess.h linguist-generated
+patch-server/videoout_120hz.h linguist-generated
