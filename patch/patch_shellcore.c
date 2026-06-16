@@ -92,8 +92,9 @@ static void patchOnNewProcess(patch_frame_context* frame, const dynlib_info* obj
     };
 
     static const struct pattern_entry ps5_patterns[] = {
-        {"55 48 89 e5 41 57 41 56 41 55 41 54 53 48 83 ec 18 49 89 ? bf 18 00 00 00 49 89 d6 49 89 f5"},     // 4.00 - 10.00
-        {"55 48 89 e5 41 57 41 56 41 55 41 54 53 50 49 89 fd bf 18 00 00 00 49 89 d7 49 89 f4 e8 ? ? ? ?"},  // 11.00+
+        {"55 48 89 e5 41 57 41 56 41 55 41 54 53 48 83 ec 18 49 89 ? bf 18 00 00 00 49 89 d6 49 89 f5"},             // 4.00 - 10.00
+        {"55 48 89 e5 41 57 41 56 41 55 41 54 53 50 49 89 fd bf 18 00 00 00 49 89 d7 49 89 f4 e8 ? ? ? ?"},          // 11.00+
+        {"55 48 89 e5 41 57 41 56 41 55 41 54 53 48 83 ec 18 49 89 fd bf 18 00 00 00 49 89 d6 49 89 f4 e8 ? ? ? ?"}, // 12.00+
     };
 
     const struct pattern_entry* patterns = is_ps4 ? ps4_patterns : ps5_patterns;
@@ -228,6 +229,7 @@ static void patchGetAppInfoSfo(patch_frame_context* frame, const dynlib_info* ob
         {"e8 ? ? ? ? 48 8b 85 ? ? ? ? 4c 89 ? ? 89 ? 48 8b 70 10 e8 ? ? ? ?", 22},                   // 4.00-8.00
         {"48 8b 85 40 ff ff ff 48 8d 75 a0 4c 89 ef 4c 89 f9 48 8b 50 10 e8 ? ? ? ? 41 89 c4", 21},  // 10.00+
         {"49 8b 55 10 48 8b bd ? ? ? ? 48 8d 75 ? 4c 89 e1 e8 ? ? ? ? 41 89 c6", 18},                // 11.00+
+        {"49 8b 55 10 48 8b bd ? ? ? ? 48 8b 8d ? ? ? ? 48 8d 75 ? e8 ? ? ? ? 41 89 c6", 22},        // 12.00+
     };
 
     const struct pattern_entry* patterns = is_ps4 ? ps4_patterns : ps5_patterns;
