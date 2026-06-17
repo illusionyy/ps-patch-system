@@ -28,6 +28,11 @@ App patching system for PS4/PS5.
 ### Screenshots (PS5)
 </summary>
 
+![](https://github.com/user-attachments/assets/7edc457b-12b8-4224-b12c-fcaeab7a8dcc)
+![](https://github.com/user-attachments/assets/ad3e631a-4757-448b-8541-7980cd7f8b7d)
+![](https://github.com/user-attachments/assets/ee307fb9-1a85-4580-bf21-c21b6d323a45)
+![](https://github.com/user-attachments/assets/69f5cdb6-bfa3-4c2d-b486-2fbcf84585d9)
+
 </details>
 
 # Usage
