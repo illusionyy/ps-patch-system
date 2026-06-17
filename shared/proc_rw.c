@@ -189,11 +189,10 @@ int userland_copyin_(pid_t pid, const void* buf, intptr_t addr, size_t len, cons
         return -1;
     }
 
-    i
     r = userland_copyout(pid, addr, tmp, len);
     printf("userland_copyout at 0x%lx is %d\n", addr, r);
     free(tmp);
-    if (res)
+    if (r)
     {
         return -1;
     }
