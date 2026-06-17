@@ -164,7 +164,7 @@ static int phys_copy_to_remote(unsigned long cr3, const void* from_local_vaddr, 
 int userland_copyin_(pid_t pid, const void* buf, intptr_t addr, size_t len, const char* user)
 {
 #if defined(__ORBIS__)
-    const int r = mdbg_copyin(pid, buf, addr, len);
+    int r = mdbg_copyin(pid, buf, addr, len);
     if (0 && r == 0)
     {
         printf("%s: copied in okay from %s\n", __FUNCSIG__, user);
@@ -188,8 +188,9 @@ int userland_copyin_(pid_t pid, const void* buf, intptr_t addr, size_t len, cons
         return -1;
     }
 
-    int res = userland_copyout(pid, addr, tmp, len);
-    printf("userland_copyout at 0x%lx is %d\n", addr, res);
+    i
+    r = userland_copyout(pid, addr, tmp, len);
+    printf("userland_copyout at 0x%lx is %d\n", addr, r);
     free(tmp);
     if (res)
     {
@@ -202,7 +203,7 @@ int userland_copyin_(pid_t pid, const void* buf, intptr_t addr, size_t len, cons
         return -1;
     }
 
-    conet int r = phys_copy_to_remote(cr3, buf, addr, len);
+    r = phys_copy_to_remote(cr3, buf, addr, len);
     printf("phys_copy_to_remote at 0x%lx is %d\n", addr, r);
     return r;
 #endif
