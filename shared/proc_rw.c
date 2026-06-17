@@ -189,6 +189,7 @@ int userland_copyin_(pid_t pid, const void* buf, intptr_t addr, size_t len, cons
     }
 
     int res = userland_copyout(pid, addr, tmp, len);
+    printf("userland_copyout at 0x%lx is %d\n", addr, res);
     free(tmp);
     if (res)
     {
@@ -201,7 +202,9 @@ int userland_copyin_(pid_t pid, const void* buf, intptr_t addr, size_t len, cons
         return -1;
     }
 
-    return phys_copy_to_remote(cr3, buf, addr, len);
+    conet int r = phys_copy_to_remote(cr3, buf, addr, len);
+    printf("phys_copy_to_remote at 0x%lx is %d\n", addr, r);
+    return r;
 #endif
 }
 
