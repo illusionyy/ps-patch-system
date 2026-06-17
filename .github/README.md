@@ -46,7 +46,7 @@ App patching system for PS4/PS5.
 - Apply patches and they should work!
 
 ### Confirmed working firmwares:
-- 3.00 - 11.70
+- 3.00 - 12.70
 
 ### Looking for 1080p limit, direct memory and native app clock patch?
 
