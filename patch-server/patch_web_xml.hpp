@@ -44,3 +44,4 @@ std::string get_settings_field_string(const fs::path& settings_file,
                                       const std::string& field,
                                       const std::string& default_value = "");
 bool apply_patch_diagnostic_enabled();
+bool apply_120hz_enabled();
