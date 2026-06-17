@@ -25,11 +25,24 @@
 
 extern int sceAppInstUtilInitialize(void);
 extern int sceAppInstUtilAppInstallAll(void*);
-extern int sceAppInstUtilAppInstallTitleDir(const char*, const char*, void*);
 
 static int install_app(const char* title_id, const char* dir)
 {
-    return sceAppInstUtilAppInstallTitleDir(title_id, dir, 0);
+    int (*sceAppInstUtilAppInstallTitleDir)(const char*, const char*, void*) = 0;
+    uint32_t handle = 0;
+
+    if (!kernel_dynlib_handle(-1, "libSceAppInstUtil.sprx", &handle))
+    {
+        static const char nid[] = "Wudg3Xe3heE";
+        sceAppInstUtilAppInstallTitleDir = (void*)kernel_dynlib_resolve(-1, handle, nid);
+    }
+
+    if (sceAppInstUtilAppInstallTitleDir)
+    {
+        return sceAppInstUtilAppInstallTitleDir(title_id, dir, 0);
+    }
+
+    return sceAppInstUtilAppInstallAll(0);
 }
 
 static int install_file(const char* path, const void* data, const size_t size)
