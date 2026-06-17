@@ -1214,6 +1214,7 @@ struct patch_web_context
     void add_settings()
     {
         add_setting("apply_patch_diagnostic", "Patch Diagnostic", "Enable verbose notification during patching process", SettingType::Bool, "0");
+        add_setting("apply_120hz_videoout", "Patch VideoOut for 120hz", "Patches libSceVideoOut for 120hz", SettingType::Bool, "0");
     }
 
     void run(const std::string& root, int p)

@@ -40,6 +40,7 @@
 #include "../shared/my_assert.h"
 
 #include "server_120hz_patch.hpp"
+#include "patch_web_xml.hpp"
 
 void patch_prx_load_for_signal(patch_frame_context& ctx, const client_data& read_client);
 void upload_init_env_ptr(const uint32_t i, const client_data& read_client);
@@ -115,7 +116,7 @@ struct dynlib_list
 #if defined(__PROSPERO__)
 static void do_120hz_patch(const pid_t pid, dynlib_list& info_list, patch_120hz::patch_120hz_context& hfr)
 {
-    if (!g_patch_registry.m_hfr_patched)
+    if (apply_120hz_enabled() && !g_patch_registry.m_hfr_patched)
     {
         constexpr auto videoOut_h = sid("libSceVideoOut.sprx");
         constexpr auto vdec2_h = sid("libSceVideodec2.sprx");

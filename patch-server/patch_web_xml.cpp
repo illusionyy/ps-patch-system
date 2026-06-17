@@ -122,7 +122,17 @@ std::string get_settings_field_string(const fs::path& settings_file,
     return get_settings_field_raw(settings_file, field, default_value);
 }
 
+static bool get_root_settings_bool(const char* name)
+{
+    return get_settings_field_bool(ROOT_XML_PATH, name);
+}
+
 bool apply_patch_diagnostic_enabled()
 {
-    return get_settings_field_bool(ROOT_XML_PATH, "apply_patch_diagnostic");
+    return get_root_settings_bool("apply_patch_diagnostic");
+}
+
+bool apply_120hz_enabled()
+{
+    return get_root_settings_bool("apply_120hz_videoout");
 }
