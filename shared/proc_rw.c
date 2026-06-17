@@ -163,8 +163,9 @@ static int phys_copy_to_remote(unsigned long cr3, const void* from_local_vaddr, 
 
 int userland_copyin_(pid_t pid, const void* buf, intptr_t addr, size_t len, const char* user)
 {
+    int r = 0;
 #if defined(__ORBIS__)
-    int r = mdbg_copyin(pid, buf, addr, len);
+    r = mdbg_copyin(pid, buf, addr, len);
     if (0 && r == 0)
     {
         printf("%s: copied in okay from %s\n", __FUNCSIG__, user);
