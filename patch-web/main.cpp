@@ -449,7 +449,7 @@ struct patch_web_context
         return o.str();
     }
 
-    static std::string common_foot()
+    static const char* common_foot()
     {
         return "<script src='/materialize.min.js'></script>\n"
                "<script>\n"
@@ -458,6 +458,13 @@ struct patch_web_context
                "  M.Tabs.init(tabElems,{swipeable:false});\n"
                "  var collElems=document.querySelectorAll('.collapsible');\n"
                "  if(collElems.length) M.Collapsible.init(collElems);\n"
+               "  document.querySelectorAll('.tabs .tab a').forEach(function(a){\n"
+               "    a.addEventListener('click',function(e){\n"
+               "      e.preventDefault();\n"
+               "      var href=a.getAttribute('href');\n"
+               "      setTimeout(function(){window.location.href=href;},300);\n"
+               "    });\n"
+               "  });\n"
                "});\n"
                "</script>\n"
                "</div></body></html>\n";
