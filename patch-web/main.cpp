@@ -50,7 +50,8 @@ static const std::map<std::string, std::string> g_friendly_names = {
     {XML_SYSTEM_PATH, "System"},
 };
 
-static const char SETTINGS_TAB[] = "__settings__";
+#define SETTINGS_TAB "__settings__"
+static const constexpr auto SETTINGS_TAB_h = sid(SETTINGS_TAB);
 static const constexpr auto xml_hash = sid(".xml");
 
 static std::string friendly_tab_name(const std::string& dirname)
@@ -473,7 +474,8 @@ struct patch_web_context
     std::string build_tab_nav(const std::vector<fs::path>& dirs,
                               const std::string& active_dirname) const
     {
-        if (dirs.empty() && active_dirname != SETTINGS_TAB)
+        const auto active_h = sid(active_dirname.c_str());
+        if (dirs.empty() && active_h != SETTINGS_TAB_h)
         {
             return "";
         }
@@ -485,12 +487,12 @@ struct patch_web_context
         for (auto& dir : dirs)
         {
             std::string d = dir.filename().string();
-            bool active = (d == active_dirname);
+            bool active = (sid(d.c_str()) == active_h);
             o << "<li class='tab'><a href='/" << he(d) << "'"
               << (active ? " class='active'" : "") << ">"
               << he(friendly_tab_name(d)) << "</a></li>\n";
         }
-        const bool settings_active = (active_dirname == SETTINGS_TAB);
+        const bool settings_active = (active_h == SETTINGS_TAB_h);
         o << "<li class='tab'><a href='/settings'"
           << (settings_active ? " class='active'" : "")
           << ">&#9881; Settings</a></li>\n";
