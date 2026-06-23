@@ -579,6 +579,9 @@ jmp rax
 strncpy:
 movabs rax, -1
 jmp rax
+dynlib_get_obj_member:
+movabs rax, -1
+jmp rax
 )";
     try
     {
