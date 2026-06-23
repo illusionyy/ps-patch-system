@@ -205,7 +205,7 @@ int __export_PS4_GetAppInfoHook(const char* title_id, const void* param_2, shell
 
 int __export_PS5_GetAppInfoHook(const char* title_id, const void* param_2, shellcore_app_info* pInfo)
 {
-    printf(FILE_FUNC_LINE ": (%p,%p,%p)\n", title_id, param_2, pInfo);
+    unotify(FILE_FUNC_LINE ": (%p,%p,%p)\n", title_id, param_2, pInfo);
     const int r = __export_GetAppInfoHook(title_id, param_2, (void*)pInfo);
     if (!pInfo || !title_id)
     {
@@ -217,7 +217,7 @@ int __export_PS5_GetAppInfoHook(const char* title_id, const void* param_2, shell
 }
 int __export_PS5_GetAppInfoHook2(const char* title_id, const void* param_2, const void* param_3, shellcore_app_info* pInfo)
 {
-    printf(FILE_FUNC_LINE ": (%p,%p,%p,%p)\n", title_id, param_2, param_3, pInfo);
+    unotify(FILE_FUNC_LINE ": (%p,%p,%p,%p)\n", title_id, param_2, param_3, pInfo);
     const int r = __export_GetAppInfoHook(title_id, param_2, param_3, (void*)pInfo);
     if (!pInfo || !title_id)
     {
