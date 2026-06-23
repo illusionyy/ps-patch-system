@@ -129,26 +129,12 @@ union ATTRIBUTE3
     };
 };
 
-static_assert_expression(sizeof(ATTRIBUTE) == sizeof(uint32_t));
-static_assert_expression(sizeof(ATTRIBUTE2) == sizeof(uint32_t));
-static_assert_expression(sizeof(ATTRIBUTE3) == sizeof(uint32_t));
-
-union shellcore_app_info
+struct attr
 {
-    struct
-    {
-        char pad[0x19c];  // since 5.05, this remains same (currently 12.52)
-        ATTRIBUTE ATTRIBUTE;
-        ATTRIBUTE2 ATTRIBUTE2;
-    } ps4;
-
-    struct
-    {
-        char pad[0x26c];  // only checked 4.50 and 8.00, seems same
-        ATTRIBUTE ATTRIBUTE;
-        ATTRIBUTE2 ATTRIBUTE2;
-        ATTRIBUTE3 ATTRIBUTE3;
-    } ps5;
+    ATTRIBUTE ATTRIBUTE;
+    ATTRIBUTE2 ATTRIBUTE2;
+    ATTRIBUTE3 ATTRIBUTE3;  // not valid on ps4
+    uint32_t ATTRIBUTE4;    // only valid on ps5 11.00
 };
 
 extern "C" int __export_GetAppInfoHook(const char* title_id, const void* param_2, const void* param_3, const void* param_4 = 0);
@@ -163,10 +149,71 @@ static bool disable_debug_print = true;
 
 #define dprintf(...) (disable_debug_print ? (void)0 : (void)printf(__VA_ARGS__))
 
-static void checkPS4Pro(const char* title_id, shellcore_app_info* pInfo, const int v)
+extern "C" int dynlib_get_obj_member(const uint32_t module_id, const size_t which, void** out);
+
+static int get_firmware_version_from_disk(const int platform, uint32_t& out)
+{
+    static uint32_t cached = 0;
+    if (!cached)
+    {
+        void* sce_proc_param = 0;
+        int r = 0;
+        const uint32_t libkernel_sys = 0x2001;
+        perror_on_non_zero(r = dynlib_get_obj_member(libkernel_sys, 8, &sce_proc_param), r);
+        if (r || !sce_proc_param)
+        {
+            return -__LINE__;
+        }
+        const uint32_t* spp = (uint32_t*)sce_proc_param;
+        // on ps5, 4 is ps4 ver, 5 is ps5 ver
+        const size_t fw_idx = platform == is_ps4 ? 4 : 5;
+        out = cached = spp[fw_idx];
+        return 0;
+    }
+    else
+    {
+        out = cached;
+        return 0;
+    }
+    return -__LINE__;
+}
+
+static uint32_t get_fw(const int p)
+{
+    uint32_t c = 0;
+    get_firmware_version_from_disk(p, c);
+    return c >> 16;
+}
+
+static uintptr_t get_ps5_attr()
+{
+    switch (get_fw(is_ps5))
+    {
+        case 0x100 ... 0x1060:
+        {
+            return 0x26c;
+        }
+        // 11.00 or newer
+        default:
+        {
+            return 0x1f4;
+        }
+    }
+}
+
+static uintptr_t get_ps4_attr()
+{
+    return 0x19c;
+}
+
+static attr& get_attr_field(const uintptr_t pInfoAddr, const int platform)
+{
+    return platform == is_ps4 ? *(attr*)(pInfoAddr + get_ps4_attr()) : *(attr*)(pInfoAddr + get_ps5_attr());
+}
+
+static void checkPS4Pro(const char* title_id, ATTRIBUTE& attr, const int v)
 {
     const int disable_ps4_pro = match_line_in_file(BASE_PATH "/disable_ps4_pro.txt", title_id);
-    ATTRIBUTE& attr = (v == is_ps4) ? pInfo->ps4.ATTRIBUTE : pInfo->ps5.ATTRIBUTE;
     dprintf("attr.all: 0x%08x\n", attr.v);
     dprintf("attr.kPS4Pro: %d\n", attr.kPS4Pro);
     if (attr.kPS4Pro && disable_ps4_pro == 1)
@@ -191,40 +238,43 @@ static void enableHFR(const char* title_id, ATTRIBUTE3& a3)
 
 extern "C"
 {
-int __export_PS4_GetAppInfoHook(const char* title_id, const void* param_2, shellcore_app_info* pInfo)
+int __export_PS4_GetAppInfoHook(const char* title_id, const void* param_2, uintptr_t pInfo)
 {
-    printf(FILE_FUNC_LINE ": (%p,%p,%p)\n", title_id, param_2, pInfo);
+    printf(FILE_FUNC_LINE ": (%p,%p,%lx)\n", title_id, param_2, pInfo);
     const int r = __export_GetAppInfoHook(title_id, param_2, (void*)pInfo);
     if (!pInfo || !title_id)
     {
         return r;
     }
-    checkPS4Pro(title_id, pInfo, is_ps4);
+    attr& attr_f = get_attr_field(pInfo, is_ps4);
+    checkPS4Pro(title_id, attr_f.ATTRIBUTE, is_ps4);
     return r;
 }
 
-int __export_PS5_GetAppInfoHook(const char* title_id, const void* param_2, shellcore_app_info* pInfo)
+int __export_PS5_GetAppInfoHook(const char* title_id, const void* param_2, uintptr_t pInfo)
 {
-    printf(FILE_FUNC_LINE ": (%p,%p,%p)\n", title_id, param_2, pInfo);
+    unotify(FILE_FUNC_LINE ": (%p,%p,%lx)\n", title_id, param_2, pInfo);
     const int r = __export_GetAppInfoHook(title_id, param_2, (void*)pInfo);
     if (!pInfo || !title_id)
     {
         return r;
     }
-    checkPS4Pro(title_id, pInfo, is_ps5);
-    enableHFR(title_id, pInfo->ps5.ATTRIBUTE3);
+    attr& attr_f = get_attr_field(pInfo, is_ps5);
+    checkPS4Pro(title_id, attr_f.ATTRIBUTE, is_ps5);
+    enableHFR(title_id, attr_f.ATTRIBUTE3);
     return r;
 }
-int __export_PS5_GetAppInfoHook2(const char* title_id, const void* param_2, const void* param_3, shellcore_app_info* pInfo)
+int __export_PS5_GetAppInfoHook2(const char* title_id, const void* param_2, const void* param_3, uintptr_t pInfo)
 {
-    printf(FILE_FUNC_LINE ": (%p,%p,%p,%p)\n", title_id, param_2, param_3, pInfo);
+    unotify(FILE_FUNC_LINE ": (%p,%p,%p,%lx)\n", title_id, param_2, param_3, pInfo);
     const int r = __export_GetAppInfoHook(title_id, param_2, param_3, (void*)pInfo);
     if (!pInfo || !title_id)
     {
         return r;
     }
-    checkPS4Pro(title_id, pInfo, is_ps5);
-    enableHFR(title_id, pInfo->ps5.ATTRIBUTE3);
+    attr& attr_f = get_attr_field(pInfo, is_ps5);
+    checkPS4Pro(title_id, attr_f.ATTRIBUTE, is_ps5);
+    enableHFR(title_id, attr_f.ATTRIBUTE3);
     return r;
 }
 }

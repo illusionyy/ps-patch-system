@@ -172,6 +172,7 @@ static void patchOnNewProcess(patch_frame_context* frame, const dynlib_info* obj
                 sym(__error, 0x2001),
                 sym(strerror, 0x2),
                 sym(strncpy, 0x2),
+                sym(dynlib_get_obj_member, 0x2001),
             };
         if (write_syms(pid, code_copy, symlist, _countof(symlist)) == 0)
         {
