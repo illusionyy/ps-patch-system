@@ -180,6 +180,7 @@ jobs:
         archive: false
 
     - name: Upload release
+      if: github.event_name != 'pull_request'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
