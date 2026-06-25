@@ -150,6 +150,22 @@ static uintptr_t resolve_addr(const char* s, const dynlib_info& info, const char
     return res;
 }
 
+static bool isHexSym(const std::string& s)
+{
+    return (s.size() >= 2 && (s[0] == '$' || s[0] == '#'));
+}
+
+static bool isHex0x(const std::string& s)
+{
+    return (s.size() >= 3 && s[0] == '0' && (s[1] == 'x' || s[1] == 'X'));
+}
+
+// possible prefixes == (s == `0x` || s == `#` || s == `$`) will be interpet as hex value, else is decimal
+static int convertNumBase(const std::string& s)
+{
+    return (isHex0x(s) || isHexSym(s)) ? 16 : 10;
+}
+
 void patch_xml_context::apply_patch(const patch_line& pline)
 {
     const int pid = read_client.clientPid;
@@ -159,28 +175,28 @@ void patch_xml_context::apply_patch(const patch_line& pline)
         case sid("byte"):
         {
             const uintptr_t addr = resolve_addr(pline.address, info, pline.imagebase);
-            const uint8_t v = (uint8_t)std::stoull(pline.value, nullptr, 0);
+            const uint8_t v = (uint8_t)std::stoull(pline.value, nullptr, convertNumBase(pline.value));
             userland_copyin2(pid, addr, &v, sizeof(v));
             break;
         }
         case sid("bytes16"):
         {
             const uintptr_t addr = resolve_addr(pline.address, info, pline.imagebase);
-            const uint16_t v = (uint16_t)std::stoull(pline.value, nullptr, 0);
+            const uint16_t v = (uint16_t)std::stoull(pline.value, nullptr, convertNumBase(pline.value));
             userland_copyin2(pid, addr, &v, sizeof(v));
             break;
         }
         case sid("bytes32"):
         {
             const uintptr_t addr = resolve_addr(pline.address, info, pline.imagebase);
-            const uint32_t v = (uint32_t)std::stoull(pline.value, nullptr, 0);
+            const uint32_t v = (uint32_t)std::stoull(pline.value, nullptr, convertNumBase(pline.value));
             userland_copyin2(pid, addr, &v, sizeof(v));
             break;
         }
         case sid("bytes64"):
         {
             const uintptr_t addr = resolve_addr(pline.address, info, pline.imagebase);
-            const int64_t v = std::stoll(pline.value, nullptr, 0);
+            const int64_t v = std::stoll(pline.value, nullptr, convertNumBase(pline.value));
             userland_copyin2(pid, addr, &v, sizeof(v));
             break;
         }
