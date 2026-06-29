@@ -196,7 +196,8 @@ void patch_xml_context::apply_patch(const patch_line& pline)
         case sid("bytes64"):
         {
             const uintptr_t addr = resolve_addr(pline.address, info, pline.imagebase);
-            const int64_t v = std::stoll(pline.value, nullptr, convertNumBase(pline.value));
+            const int nb = convertNumBase(pline.value);
+            const auto v = nb == 16 ? std::stoull(pline.value, nullptr, nb) : std::stoll(pline.value, nullptr, nb);
             userland_copyin2(pid, addr, &v, sizeof(v));
             break;
         }
