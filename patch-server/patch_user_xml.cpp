@@ -527,7 +527,13 @@ int patch_xml_context::read_xml()
             }
             catch (const std::exception& e)
             {
-                notify_static(e.what());
+                notify(
+                    "Failed to apply patch %s:%s:%s\n"
+                    "error: %s\n",
+                    pline.type,
+                    pline.address,
+                    pline.value,
+                    e.what());
                 continue;
             }
         }
