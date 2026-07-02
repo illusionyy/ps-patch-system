@@ -91,6 +91,7 @@ static bool is_forbidden_titleid(const uint32_t name)
         case sid("NPXS40093"):  // common dialog, SceCdlgApp ps5
         case sid("NPXS21016"):  // SceSpZeroConf ps4
         case sid("NPXS40112"):  // SceSpZeroConf ps5
+        case sid("NPXS40146"):  // SceShareVideoTranscoder ps5
             // case sid("CUSA00960"):  // Vue
             {
                 return true;
