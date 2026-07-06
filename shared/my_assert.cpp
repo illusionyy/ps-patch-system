@@ -14,11 +14,11 @@ _Noreturn void my_assert_(const assert_info* pInfo, const char* extra_msg)
 {
     struct buf
     {
-        char program[MAX_PATH + 1];
+        char program[PROC_BUFF_N];
         char msg[(msg_buf * 2) + sizeof(program)];  // yes, actually need cpp mode for this. nyaa. just to avoid inline memset.
     } buf = {};
 
-    sys_thr_get_name(getpid(), buf.program, sizeof_1(buf.program));
+    sys_thr_get_name(getpid(), buf.program);
     snprintf(buf.msg, _countof_1(buf.msg), "Assertion failed: (%s), program %s, function %s, file %s, line %ld.%s", pInfo->failedexpr, buf.program, pInfo->func, pInfo->file, pInfo->line, extra_msg ? extra_msg : "");
     printf("%s\n", buf.msg);
     notify_(true, pInfo->user, buf.msg);
