@@ -193,10 +193,9 @@ static int patch_apps(config* param_3)
         char cmd[32] = {};
         sceKernelGetProcessName(ki->ki_pid, cmd, sizeof(cmd));
 
-        const int r = sceKernelGetAppInfo(ki->ki_pid, &appinfo2);
-        if (r)
+        if (sceKernelGetAppInfo(ki->ki_pid, &appinfo2))
         {
-            printf("sceKernelGetAppInfo 0x%x\n", r);
+            memset(&appinfo2, 0, sizeof(appinfo2));
         }
 
         const char* state_buf = state_abbrev(ki->ki_stat);
