@@ -16,10 +16,13 @@
 
 #include "notify.h"
 
-int sys_thr_get_name(const int pid, char* buf, const unsigned long nbuf)
+#include "proc.h"
+
+int sys_thr_get_name(const int pid, char buf[PROC_BUFF_N])
 {
     const int SYS_thr_get_name = 0x268;
-    return syscall(SYS_thr_get_name, pid, buf, nbuf);
+    // note: cant use sizeof(buf), compiler will tell you sizeof(char*)!
+    return syscall(SYS_thr_get_name, pid, buf, PROC_BUFF_N);
 }
 
 pid_t findpid(const char* procname)
