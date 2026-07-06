@@ -64,11 +64,13 @@ __END_DECLS
 #include <ps4/kernel.h>
 #endif
 
+#include "proc.h"
+
 typedef struct dynlib_info
 {
     dynlib_obj_t obj;
     char path[1024];
-    char name[1024];
+    char name[PROC_BUFF_N];
 } dynlib_info;
 
 __BEGIN_DECLS
