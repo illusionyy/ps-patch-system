@@ -1,6 +1,7 @@
 #include "dynlib.h"
 #include "macro.h"
 #include <stdio.h>
+#include <string.h>
 #include "memory.h"
 #include "proc.h"
 
@@ -178,11 +179,13 @@ int kernel_dynlib_info2(const int pid, const unsigned int handle, dynlib_info* i
         }
         if (kernel_copyout(kpath, info->path, sizeof(info->path)) < 0)
         {
+            memset(info->path, 0, sizeof(info->path));
             return -__LINE__;
         }
         info->path[_countof_1(info->path)] = '\0';
         if (sys_thr_get_name(pid, info->name))
         {
+            memset(info->name, 0, sizeof(info->name));
             perror("sys_thr_get_name");
             return -__LINE__;
         }
