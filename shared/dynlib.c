@@ -181,7 +181,7 @@ int kernel_dynlib_info2(const int pid, const unsigned int handle, dynlib_info* i
             return -__LINE__;
         }
         info->path[_countof_1(info->path)] = '\0';
-        if (sys_thr_get_name(pid, info->name, sizeof(info->name)))
+        if (sys_thr_get_name(pid, info->name))
         {
             perror("sys_thr_get_name");
             return -__LINE__;
