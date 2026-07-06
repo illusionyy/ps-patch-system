@@ -119,8 +119,37 @@ static const char* state_abbrev(const size_t n)
     return "";
 }
 
+static bool ignore_procname(const pid_t pid)
+{
+    char cmd[32] = {};
+    sceKernelGetProcessName(pid, cmd, sizeof(cmd));
+    switch (sid(cmd))
+    {
+        case sid("payload.elf"):  // PS5
+        case sid("Payload"):      // PS4, nyaaa, why the fuck is it different?
+                                  // i'm not insane right? nya
+                                  // https://github.com/ps5-payload-dev/elfldr/blob/699e8bcff03e91e8d6ca6eba281af25c5a58d8c2/socksrv.c#L219
+                                  // sets by argv[0], https://github.com/ps5-payload-dev/elfldr/blob/699e8bcff03e91e8d6ca6eba281af25c5a58d8c2/elfldr.c#L704
+                                  // https://github.com/ps4-payload-dev/elfldr/blob/b3ee49746cb9f3464e8dc75ec6387e8408558b8a/elfldr.c#L587
+        {
+            printf("ignoring %s process %d\n", cmd, pid);
+            return true;
+        }
+        default:
+        {
+            break;
+        }
+    }
+    return false;
+}
+
 static int patch_apps(config* param_3)
 {
+    const pid_t clientPid = param_3->clientPid;
+    if (ignore_procname(clientPid))
+    {
+        return 0;
+    }
     int mib[4] = {};
     mib[0] = CTL_KERN;
     mib[1] = KERN_PROC;
@@ -190,7 +219,6 @@ static int patch_apps(config* param_3)
                cmd);
     }
 
-    const pid_t clientPid = param_3->clientPid;
     for (uint8_t* ptr = buf; ptr < (buf + buf_size);)
     {
         app_info_t appinfo = {};
@@ -201,17 +229,6 @@ static int patch_apps(config* param_3)
         bool okay = false;
         switch (sid(ki->ki_comm))
         {
-            case sid("payload.elf"):  // PS5
-            case sid("Payload"):      // PS4, nyaaa, why the fuck is it different?
-                                      // i'm not insane right? nya
-                                      // https://github.com/ps5-payload-dev/elfldr/blob/699e8bcff03e91e8d6ca6eba281af25c5a58d8c2/socksrv.c#L219
-                                      // sets by argv[0], https://github.com/ps5-payload-dev/elfldr/blob/699e8bcff03e91e8d6ca6eba281af25c5a58d8c2/elfldr.c#L704
-                                      // https://github.com/ps4-payload-dev/elfldr/blob/b3ee49746cb9f3464e8dc75ec6387e8408558b8a/elfldr.c#L587
-            {
-                printf("ignoring payload process %d\n", clientPid);
-                okay = true;
-                break;
-            }
             case sid("patch-server.elf"):
             {
                 client_data data = {};
