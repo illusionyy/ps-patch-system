@@ -35,7 +35,7 @@ static const unsigned long dynlib_get_obj_member_offset = 0x180;
 static const unsigned long __export_onNewProcess_hook_offset = 0x18a;
 static const unsigned long __export_PS4_GetAppInfoHook_offset = 0x4d7;
 static const unsigned long __export_PS5_GetAppInfoHook_offset = 0x5b8;
-static const unsigned long __export_PS5_GetAppInfoHook2_offset = 0x710;
+static const unsigned long __export_PS5_GetAppInfoHook2_offset = 0x640;
 
 static const unsigned char shellcode[] = {
     0x00, 0x00, 0x00, 0x00, 0x00,                                                                    // .zero 5 # pad out original entry point
@@ -154,7 +154,7 @@ static const unsigned char shellcode[] = {
                                                                                                      // L_BB0_1:
     0xbe, 0xff, 0xff, 0xff, 0xff,                                                                    // mov	esi, -1
                                                                                                      // L_BB0_3:
-    0x48, 0x8d, 0x3d, 0x14, 0x0b, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str]
+    0x48, 0x8d, 0x3d, 0xfd, 0x0a, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str]
     0x31, 0xc0,                                                                                      // xor	eax, eax
     0xe8, 0x00, 0xff, 0xff, 0xff,                                                                    // call	printf
     0x4c, 0x89, 0xff,                                                                                // mov	rdi, r15
@@ -168,7 +168,7 @@ static const unsigned char shellcode[] = {
     0xe8, 0x1e, 0x00, 0x00, 0x00,                                                                    // call	_ZL10patch_appsP6config
     0x85, 0xc0,                                                                                      // test	eax, eax
     0x75, 0x0c,                                                                                      // jne	L_BB0_6
-    0x48, 0x8d, 0x3d, 0x16, 0x0b, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.1]
+    0x48, 0x8d, 0x3d, 0xff, 0x0a, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.1]
     0xe8, 0x72, 0xfe, 0xff, 0xff,                                                                    // call	puts
                                                                                                      // L_BB0_6:
     0x44, 0x89, 0xf0,                                                                                // mov	eax, r14d
@@ -217,7 +217,7 @@ static const unsigned char shellcode[] = {
     0xe8, 0x8f, 0xfd, 0xff, 0xff,                                                                    // call	sysctl
     0x85, 0xc0,                                                                                      // test	eax, eax
     0x0f, 0x85, 0x32, 0x02, 0x00, 0x00,                                                              // jne	L_BB1_5
-    0x48, 0x8d, 0x3d, 0xde, 0x11, 0x00, 0x00,                                                        // lea	rdi, [rip + L_str]
+    0x48, 0x8d, 0x3d, 0xc7, 0x11, 0x00, 0x00,                                                        // lea	rdi, [rip + L_str]
     0xe8, 0xc3, 0xfd, 0xff, 0xff,                                                                    // call	puts
     0x48, 0x83, 0x7d, 0xd0, 0x00,                                                                    // cmp	qword ptr [rbp - 48], 0
     0x0f, 0x8e, 0xd9, 0x01, 0x00, 0x00,                                                              // jle	L_BB1_19
@@ -228,7 +228,7 @@ static const unsigned char shellcode[] = {
                                                                                                      // L_BB1_10:
     0x4d, 0x01, 0xf4,                                                                                // add	r12, r14
     0x49, 0x0f, 0xbe, 0xbe, 0x84, 0x01, 0x00, 0x00,                                                  // movsx	rdi, byte ptr [r14 + 388]
-    0xe8, 0x32, 0x07, 0x00, 0x00,                                                                    // call	_ZL12state_abbrevm
+    0xe8, 0x1b, 0x07, 0x00, 0x00,                                                                    // call	_ZL12state_abbrevm
     0x49, 0x89, 0xc2,                                                                                // mov	r10, rax
     0x41, 0x8b, 0x76, 0x48,                                                                          // mov	esi, dword ptr [r14 + 72]
     0x41, 0x8b, 0x56, 0x4c,                                                                          // mov	edx, dword ptr [r14 + 76]
@@ -243,7 +243,7 @@ static const unsigned char shellcode[] = {
     0x49, 0xc1, 0xfb, 0x06,                                                                          // sar	r11, 6
     0x4d, 0x8b, 0xb6, 0x00, 0x01, 0x00, 0x00,                                                        // mov	r14, qword ptr [r14 + 256]
     0x49, 0xc1, 0xee, 0x14,                                                                          // shr	r14, 20
-    0x48, 0x8d, 0x3d, 0x5f, 0x0c, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.14]
+    0x48, 0x8d, 0x3d, 0x48, 0x0c, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.14]
     0x31, 0xc0,                                                                                      // xor	eax, eax
     0x41, 0x57,                                                                                      // push	r15
     0x41, 0x56,                                                                                      // push	r14
@@ -279,7 +279,7 @@ static const unsigned char shellcode[] = {
     0xe8, 0xa3, 0xfc, 0xff, 0xff,                                                                    // call	sceKernelGetAppInfo
     0x85, 0xc0,                                                                                      // test	eax, eax
     0x0f, 0x84, 0x17, 0xff, 0xff, 0xff,                                                              // je	L_BB1_10
-    0x48, 0x8d, 0x3d, 0xae, 0x0b, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.13]
+    0x48, 0x8d, 0x3d, 0x97, 0x0b, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.13]
     0x89, 0xc6,                                                                                      // mov	esi, eax
     0x31, 0xc0,                                                                                      // xor	eax, eax
     0xe8, 0x0f, 0xfd, 0xff, 0xff,                                                                    // call	printf
@@ -304,7 +304,7 @@ static const unsigned char shellcode[] = {
     0x4c, 0x89, 0xfe,                                                                                // mov	rsi, r15
     0xe8, 0x2f, 0xfc, 0xff, 0xff,                                                                    // call	sceKernelGetAppInfo
     0x49, 0x8d, 0xbc, 0x24, 0xbf, 0x01, 0x00, 0x00,                                                  // lea	rdi, [r12 + 447]
-    0xe8, 0x62, 0x06, 0x00, 0x00,                                                                    // call	_Z8stringidPKc
+    0xe8, 0x4b, 0x06, 0x00, 0x00,                                                                    // call	_Z8stringidPKc
     0x3d, 0x42, 0x6c, 0xc7, 0xeb,                                                                    // cmp	eax, -339252158
     0x74, 0x1f,                                                                                      // je	L_BB1_17
     0x3d, 0xc4, 0xc1, 0xe4, 0xb1,                                                                    // cmp	eax, -1310408252
@@ -318,7 +318,7 @@ static const unsigned char shellcode[] = {
     0x72, 0x92,                                                                                      // jb	L_BB1_14
     0xeb, 0x41,                                                                                      // jmp	L_BB1_19
                                                                                                      // L_BB1_17:
-    0x48, 0x8d, 0x3d, 0x71, 0x0b, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.16]
+    0x48, 0x8d, 0x3d, 0x5a, 0x0b, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.16]
     0x44, 0x89, 0xf6,                                                                                // mov	esi, r14d
     0x31, 0xc0,                                                                                      // xor	eax, eax
     0xe8, 0x6f, 0xfc, 0xff, 0xff,                                                                    // call	printf
@@ -328,12 +328,12 @@ static const unsigned char shellcode[] = {
     0x44, 0x89, 0x75, 0x90,                                                                          // mov	dword ptr [rbp - 112], r14d
     0x8b, 0x95, 0x30, 0xff, 0xff, 0xff,                                                              // mov	edx, dword ptr [rbp - 208]
     0x89, 0x55, 0x94,                                                                                // mov	dword ptr [rbp - 108], edx
-    0x48, 0x8d, 0x3d, 0x67, 0x0b, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.17]
+    0x48, 0x8d, 0x3d, 0x50, 0x0b, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.17]
     0x44, 0x89, 0xf6,                                                                                // mov	esi, r14d
     0x31, 0xc0,                                                                                      // xor	eax, eax
     0xe8, 0x48, 0xfc, 0xff, 0xff,                                                                    // call	printf
     0x48, 0x8d, 0x7d, 0x90,                                                                          // lea	rdi, [rbp - 112]
-    0xe8, 0x1c, 0x06, 0x00, 0x00,                                                                    // call	_ZL22send_signal_to_payloadiR11client_data
+    0xe8, 0x05, 0x06, 0x00, 0x00,                                                                    // call	_ZL22send_signal_to_payloadiR11client_data
                                                                                                      // L_BB1_19:
     0x48, 0x89, 0xdf,                                                                                // mov	rdi, rbx
     0xe8, 0xa7, 0xfb, 0xff, 0xff,                                                                    // call	free
@@ -348,17 +348,17 @@ static const unsigned char shellcode[] = {
     0x5d,                                                                                            // pop	rbp
     0xc3,                                                                                            // ret
                                                                                                      // L_BB1_1:
-    0x48, 0x8d, 0x3d, 0xa4, 0x0a, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.10]
+    0x48, 0x8d, 0x3d, 0x8d, 0x0a, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.10]
     0xe8, 0x3b, 0xfc, 0xff, 0xff,                                                                    // call	perror
     0xb8, 0x78, 0xff, 0xff, 0xff,                                                                    // mov	eax, -136
     0xeb, 0xdb,                                                                                      // jmp	L_BB1_20
                                                                                                      // L_BB1_3:
-    0x48, 0x8d, 0x3d, 0x98, 0x0a, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.11]
+    0x48, 0x8d, 0x3d, 0x81, 0x0a, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.11]
     0xe8, 0x28, 0xfc, 0xff, 0xff,                                                                    // call	perror
     0xb8, 0x71, 0xff, 0xff, 0xff,                                                                    // mov	eax, -143
     0xeb, 0xc8,                                                                                      // jmp	L_BB1_20
                                                                                                      // L_BB1_5:
-    0x48, 0x8d, 0x3d, 0x7e, 0x0a, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.10]
+    0x48, 0x8d, 0x3d, 0x67, 0x0a, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.10]
     0xe8, 0x15, 0xfc, 0xff, 0xff,                                                                    // call	perror
     0x48, 0x89, 0xdf,                                                                                // mov	rdi, rbx
     0xe8, 0x59, 0xfb, 0xff, 0xff,                                                                    // call	free
@@ -374,7 +374,7 @@ static const unsigned char shellcode[] = {
     0x49, 0x89, 0xd6,                                                                                // mov	r14, rdx
     0x49, 0x89, 0xf7,                                                                                // mov	r15, rsi
     0x48, 0x89, 0xfb,                                                                                // mov	rbx, rdi
-    0x48, 0x8d, 0x3d, 0x21, 0x08, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.2]
+    0x48, 0x8d, 0x3d, 0x0a, 0x08, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.2]
     0x48, 0x89, 0xde,                                                                                // mov	rsi, rbx
     0x4c, 0x89, 0xfa,                                                                                // mov	rdx, r15
     0x4c, 0x89, 0xf1,                                                                                // mov	rcx, r14
@@ -415,7 +415,7 @@ static const unsigned char shellcode[] = {
     0x48, 0x81, 0xc3, 0x9c, 0x01, 0x00, 0x00,                                                        // add	rbx, 412
     0xeb, 0x08,                                                                                      // jmp	L_BB3_3
                                                                                                      // L_BB3_2:
-    0xe8, 0xaf, 0x06, 0x00, 0x00,                                                                    // call	_ZL12get_ps5_attrv
+    0xe8, 0x98, 0x06, 0x00, 0x00,                                                                    // call	_ZL12get_ps5_attrv
     0x48, 0x01, 0xc3,                                                                                // add	rbx, rax
                                                                                                      // L_BB3_3:
     0x48, 0x89, 0xd8,                                                                                // mov	rax, rbx
@@ -430,20 +430,20 @@ static const unsigned char shellcode[] = {
     0x53,                                                                                            // push	rbx
     0x48, 0x89, 0xf3,                                                                                // mov	rbx, rsi
     0x49, 0x89, 0xfe,                                                                                // mov	r14, rdi
-    0x48, 0x8d, 0x3d, 0xa9, 0x0e, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.39]
+    0x48, 0x8d, 0x3d, 0x92, 0x0e, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.39]
     0x4c, 0x89, 0xf6,                                                                                // mov	rsi, r14
-    0xe8, 0x2a, 0x03, 0x00, 0x00,                                                                    // call	match_line_in_file
+    0xe8, 0x13, 0x03, 0x00, 0x00,                                                                    // call	match_line_in_file
     0x83, 0xf8, 0x01,                                                                                // cmp	eax, 1
     0x75, 0x25,                                                                                      // jne	L_BB4_3
     0xb8, 0x00, 0x00, 0x80, 0x00,                                                                    // mov	eax, 8388608
     0x23, 0x03,                                                                                      // and	eax, dword ptr [rbx]
     0x74, 0x1c,                                                                                      // je	L_BB4_3
-    0x48, 0x8d, 0x15, 0xab, 0x0e, 0x00, 0x00,                                                        // lea	rdx, [rip + L_.str.42]
+    0x48, 0x8d, 0x15, 0x94, 0x0e, 0x00, 0x00,                                                        // lea	rdx, [rip + L_.str.42]
     0xbf, 0x01, 0x00, 0x00, 0x00,                                                                    // mov	edi, 1
     0x31, 0xf6,                                                                                      // xor	esi, esi
     0x4c, 0x89, 0xf1,                                                                                // mov	rcx, r14
     0x31, 0xc0,                                                                                      // xor	eax, eax
-    0xe8, 0x8c, 0x00, 0x00, 0x00,                                                                    // call	notify_
+    0xe8, 0xdc, 0x01, 0x00, 0x00,                                                                    // call	notify_
     0x80, 0x63, 0x02, 0x7f,                                                                          // and	byte ptr [rbx + 2], 127
                                                                                                      // L_BB4_3:
     0x5b,                                                                                            // pop	rbx
@@ -460,19 +460,17 @@ static const unsigned char shellcode[] = {
     0x49, 0x89, 0xd6,                                                                                // mov	r14, rdx
     0x49, 0x89, 0xf7,                                                                                // mov	r15, rsi
     0x48, 0x89, 0xfb,                                                                                // mov	rbx, rdi
-    0x48, 0x8d, 0x15, 0xc3, 0x07, 0x00, 0x00,                                                        // lea	rdx, [rip + L_.str.3]
-    0xbf, 0x01, 0x00, 0x00, 0x00,                                                                    // mov	edi, 1
-    0x31, 0xf6,                                                                                      // xor	esi, esi
-    0x48, 0x89, 0xd9,                                                                                // mov	rcx, rbx
-    0x4d, 0x89, 0xf8,                                                                                // mov	r8, r15
-    0x4d, 0x89, 0xf1,                                                                                // mov	r9, r14
+    0x48, 0x8d, 0x3d, 0xac, 0x07, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.3]
+    0x48, 0x89, 0xde,                                                                                // mov	rsi, rbx
+    0x4c, 0x89, 0xfa,                                                                                // mov	rdx, r15
+    0x4c, 0x89, 0xf1,                                                                                // mov	rcx, r14
     0x31, 0xc0,                                                                                      // xor	eax, eax
-    0xe8, 0x52, 0x00, 0x00, 0x00,                                                                    // call	notify_
+    0xe8, 0xd7, 0xfa, 0xff, 0xff,                                                                    // call	printf
     0x48, 0x89, 0xdf,                                                                                // mov	rdi, rbx
     0x4c, 0x89, 0xfe,                                                                                // mov	rsi, r15
     0x4c, 0x89, 0xf2,                                                                                // mov	rdx, r14
     0x31, 0xc9,                                                                                      // xor	ecx, ecx
-    0xe8, 0x08, 0xfb, 0xff, 0xff,                                                                    // call	__export_GetAppInfoHook
+    0xe8, 0x0f, 0xfb, 0xff, 0xff,                                                                    // call	__export_GetAppInfoHook
     0x48, 0x85, 0xdb,                                                                                // test	rbx, rbx
     0x74, 0x32,                                                                                      // je	L_BB5_3
     0x4d, 0x85, 0xf6,                                                                                // test	r14, r14
@@ -480,70 +478,18 @@ static const unsigned char shellcode[] = {
     0x4c, 0x89, 0xf7,                                                                                // mov	rdi, r14
     0xbe, 0x02, 0x00, 0x00, 0x00,                                                                    // mov	esi, 2
     0x41, 0x89, 0xc7,                                                                                // mov	r15d, eax
-    0xe8, 0x31, 0xff, 0xff, 0xff,                                                                    // call	_ZL14get_attr_fieldmi
+    0xe8, 0x38, 0xff, 0xff, 0xff,                                                                    // call	_ZL14get_attr_fieldmi
     0x49, 0x89, 0xc6,                                                                                // mov	r14, rax
     0x48, 0x89, 0xdf,                                                                                // mov	rdi, rbx
     0x48, 0x89, 0xc6,                                                                                // mov	rsi, rax
-    0xe8, 0x4c, 0xff, 0xff, 0xff,                                                                    // call	_ZL11checkPS4ProPKcR9ATTRIBUTEi
+    0xe8, 0x53, 0xff, 0xff, 0xff,                                                                    // call	_ZL11checkPS4ProPKcR9ATTRIBUTEi
     0x49, 0x83, 0xc6, 0x08,                                                                          // add	r14, 8
     0x4c, 0x89, 0xf7,                                                                                // mov	rdi, r14
-    0xe8, 0xd7, 0x00, 0x00, 0x00,                                                                    // call	_ZL9enableHFRPKcR10ATTRIBUTE3
+    0xe8, 0x0e, 0x00, 0x00, 0x00,                                                                    // call	_ZL9enableHFRPKcR10ATTRIBUTE3
     0x44, 0x89, 0xf8,                                                                                // mov	eax, r15d
                                                                                                      // L_BB5_3:
     0x48, 0x83, 0xc4, 0x08,                                                                          // add	rsp, 8
     0x5b,                                                                                            // pop	rbx
-    0x41, 0x5e,                                                                                      // pop	r14
-    0x41, 0x5f,                                                                                      // pop	r15
-    0x5d,                                                                                            // pop	rbp
-    0xc3,                                                                                            // ret
-                                                                                                     // notify_:
-    0x55,                                                                                            // push	rbp
-    0x48, 0x89, 0xe5,                                                                                // mov	rbp, rsp
-    0x41, 0x57,                                                                                      // push	r15
-    0x41, 0x56,                                                                                      // push	r14
-    0x41, 0x54,                                                                                      // push	r12
-    0x53,                                                                                            // push	rbx
-    0x48, 0x81, 0xec, 0xd0, 0x04, 0x00, 0x00,                                                        // sub	rsp, 1232
-    0x49, 0x89, 0xd7,                                                                                // mov	r15, rdx
-    0x48, 0x89, 0xf3,                                                                                // mov	rbx, rsi
-    0x41, 0x89, 0xfe,                                                                                // mov	r14d, edi
-    0x48, 0x89, 0x8d, 0x28, 0xff, 0xff, 0xff,                                                        // mov	qword ptr [rbp - 216], rcx
-    0x4c, 0x89, 0x85, 0x30, 0xff, 0xff, 0xff,                                                        // mov	qword ptr [rbp - 208], r8
-    0x4c, 0x89, 0x8d, 0x38, 0xff, 0xff, 0xff,                                                        // mov	qword ptr [rbp - 200], r9
-    0x84, 0xc0,                                                                                      // test	al, al
-    0x74, 0x2c,                                                                                      // je	L_BB6_2
-    0x0f, 0x29, 0x85, 0x40, 0xff, 0xff, 0xff,                                                        // movaps	xmmword ptr [rbp - 192], xmm0
-    0x0f, 0x29, 0x8d, 0x50, 0xff, 0xff, 0xff,                                                        // movaps	xmmword ptr [rbp - 176], xmm1
-    0x0f, 0x29, 0x95, 0x60, 0xff, 0xff, 0xff,                                                        // movaps	xmmword ptr [rbp - 160], xmm2
-    0x0f, 0x29, 0x9d, 0x70, 0xff, 0xff, 0xff,                                                        // movaps	xmmword ptr [rbp - 144], xmm3
-    0x0f, 0x29, 0x65, 0x80,                                                                          // movaps	xmmword ptr [rbp - 128], xmm4
-    0x0f, 0x29, 0x6d, 0x90,                                                                          // movaps	xmmword ptr [rbp - 112], xmm5
-    0x0f, 0x29, 0x75, 0xa0,                                                                          // movaps	xmmword ptr [rbp - 96], xmm6
-    0x0f, 0x29, 0x7d, 0xb0,                                                                          // movaps	xmmword ptr [rbp - 80], xmm7
-                                                                                                     // L_BB6_2:
-    0x4c, 0x8d, 0xa5, 0x10, 0xfb, 0xff, 0xff,                                                        // lea	r12, [rbp - 1264]
-    0xba, 0x00, 0x04, 0x00, 0x00,                                                                    // mov	edx, 1024
-    0x4c, 0x89, 0xe7,                                                                                // mov	rdi, r12
-    0x31, 0xf6,                                                                                      // xor	esi, esi
-    0xe8, 0xf0, 0xf9, 0xff, 0xff,                                                                    // call	memset
-    0x48, 0x8d, 0x85, 0x10, 0xff, 0xff, 0xff,                                                        // lea	rax, [rbp - 240]
-    0x48, 0x89, 0x45, 0xd0,                                                                          // mov	qword ptr [rbp - 48], rax
-    0x48, 0x8d, 0x45, 0x10,                                                                          // lea	rax, [rbp + 16]
-    0x48, 0x89, 0x45, 0xc8,                                                                          // mov	qword ptr [rbp - 56], rax
-    0x48, 0xb8, 0x18, 0x00, 0x00, 0x00, 0x30, 0x00, 0x00, 0x00,                                      // movabs	rax, 206158430232
-    0x48, 0x89, 0x45, 0xc0,                                                                          // mov	qword ptr [rbp - 64], rax
-    0x48, 0x8d, 0x4d, 0xc0,                                                                          // lea	rcx, [rbp - 64]
-    0xbe, 0xff, 0x03, 0x00, 0x00,                                                                    // mov	esi, 1023
-    0x4c, 0x89, 0xe7,                                                                                // mov	rdi, r12
-    0x4c, 0x89, 0xfa,                                                                                // mov	rdx, r15
-    0xe8, 0xc7, 0xf9, 0xff, 0xff,                                                                    // call	vsnprintf
-    0x44, 0x89, 0xf7,                                                                                // mov	edi, r14d
-    0x48, 0x89, 0xde,                                                                                // mov	rsi, rbx
-    0x4c, 0x89, 0xe2,                                                                                // mov	rdx, r12
-    0xe8, 0xae, 0x00, 0x00, 0x00,                                                                    // call	notify_fixed_
-    0x48, 0x81, 0xc4, 0xd0, 0x04, 0x00, 0x00,                                                        // add	rsp, 1232
-    0x5b,                                                                                            // pop	rbx
-    0x41, 0x5c,                                                                                      // pop	r12
     0x41, 0x5e,                                                                                      // pop	r14
     0x41, 0x5f,                                                                                      // pop	r15
     0x5d,                                                                                            // pop	rbp
@@ -561,43 +507,39 @@ static const unsigned char shellcode[] = {
     0x41, 0x56,                                                                                      // push	r14
     0x41, 0x54,                                                                                      // push	r12
     0x53,                                                                                            // push	rbx
-    0x48, 0x83, 0xec, 0x10,                                                                          // sub	rsp, 16
     0x49, 0x89, 0xce,                                                                                // mov	r14, rcx
     0x49, 0x89, 0xd7,                                                                                // mov	r15, rdx
     0x49, 0x89, 0xf4,                                                                                // mov	r12, rsi
     0x48, 0x89, 0xfb,                                                                                // mov	rbx, rdi
-    0x48, 0x89, 0x0c, 0x24,                                                                          // mov	qword ptr [rsp], rcx
-    0x48, 0x8d, 0x15, 0xe2, 0x06, 0x00, 0x00,                                                        // lea	rdx, [rip + L_.str.4]
-    0xbf, 0x01, 0x00, 0x00, 0x00,                                                                    // mov	edi, 1
-    0x31, 0xf6,                                                                                      // xor	esi, esi
-    0x48, 0x89, 0xd9,                                                                                // mov	rcx, rbx
-    0x4d, 0x89, 0xe0,                                                                                // mov	r8, r12
-    0x4d, 0x89, 0xf9,                                                                                // mov	r9, r15
+    0x48, 0x8d, 0x3d, 0xa3, 0x07, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.4]
+    0x48, 0x89, 0xde,                                                                                // mov	rsi, rbx
+    0x4c, 0x89, 0xe2,                                                                                // mov	rdx, r12
+    0x4c, 0x89, 0xf9,                                                                                // mov	rcx, r15
+    0x4d, 0x89, 0xf0,                                                                                // mov	r8, r14
     0x31, 0xc0,                                                                                      // xor	eax, eax
-    0xe8, 0xee, 0xfe, 0xff, 0xff,                                                                    // call	notify_
+    0xe8, 0x48, 0xfa, 0xff, 0xff,                                                                    // call	printf
     0x48, 0x89, 0xdf,                                                                                // mov	rdi, rbx
     0x4c, 0x89, 0xe6,                                                                                // mov	rsi, r12
     0x4c, 0x89, 0xfa,                                                                                // mov	rdx, r15
     0x4c, 0x89, 0xf1,                                                                                // mov	rcx, r14
-    0xe8, 0xa3, 0xf9, 0xff, 0xff,                                                                    // call	__export_GetAppInfoHook
+    0xe8, 0x7f, 0xfa, 0xff, 0xff,                                                                    // call	__export_GetAppInfoHook
     0x48, 0x85, 0xdb,                                                                                // test	rbx, rbx
-    0x74, 0x32,                                                                                      // je	L_BB8_3
+    0x74, 0x32,                                                                                      // je	L_BB7_3
     0x4d, 0x85, 0xf6,                                                                                // test	r14, r14
-    0x74, 0x2d,                                                                                      // je	L_BB8_3
+    0x74, 0x2d,                                                                                      // je	L_BB7_3
     0x4c, 0x89, 0xf7,                                                                                // mov	rdi, r14
     0xbe, 0x02, 0x00, 0x00, 0x00,                                                                    // mov	esi, 2
     0x41, 0x89, 0xc7,                                                                                // mov	r15d, eax
-    0xe8, 0xcc, 0xfd, 0xff, 0xff,                                                                    // call	_ZL14get_attr_fieldmi
+    0xe8, 0xa8, 0xfe, 0xff, 0xff,                                                                    // call	_ZL14get_attr_fieldmi
     0x49, 0x89, 0xc6,                                                                                // mov	r14, rax
     0x48, 0x89, 0xdf,                                                                                // mov	rdi, rbx
     0x48, 0x89, 0xc6,                                                                                // mov	rsi, rax
-    0xe8, 0xe7, 0xfd, 0xff, 0xff,                                                                    // call	_ZL11checkPS4ProPKcR9ATTRIBUTEi
+    0xe8, 0xc3, 0xfe, 0xff, 0xff,                                                                    // call	_ZL11checkPS4ProPKcR9ATTRIBUTEi
     0x49, 0x83, 0xc6, 0x08,                                                                          // add	r14, 8
     0x4c, 0x89, 0xf7,                                                                                // mov	rdi, r14
-    0xe8, 0x72, 0xff, 0xff, 0xff,                                                                    // call	_ZL9enableHFRPKcR10ATTRIBUTE3
+    0xe8, 0x7e, 0xff, 0xff, 0xff,                                                                    // call	_ZL9enableHFRPKcR10ATTRIBUTE3
     0x44, 0x89, 0xf8,                                                                                // mov	eax, r15d
-                                                                                                     // L_BB8_3:
-    0x48, 0x83, 0xc4, 0x10,                                                                          // add	rsp, 16
+                                                                                                     // L_BB7_3:
     0x5b,                                                                                            // pop	rbx
     0x41, 0x5c,                                                                                      // pop	r12
     0x41, 0x5e,                                                                                      // pop	r14
@@ -618,46 +560,98 @@ static const unsigned char shellcode[] = {
     0x48, 0x8d, 0xbd, 0xb0, 0xf3, 0xff, 0xff,                                                        // lea	rdi, [rbp - 3152]
     0xba, 0x30, 0x0c, 0x00, 0x00,                                                                    // mov	edx, 3120
     0x31, 0xf6,                                                                                      // xor	esi, esi
-    0xe8, 0xd2, 0xf8, 0xff, 0xff,                                                                    // call	memset
+    0xe8, 0xb2, 0xf9, 0xff, 0xff,                                                                    // call	memset
     0xc7, 0x85, 0xc0, 0xf3, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,                                      // mov	dword ptr [rbp - 3136], -1
     0x4c, 0x8d, 0xb5, 0xdd, 0xf3, 0xff, 0xff,                                                        // lea	r14, [rbp - 3107]
     0xba, 0xff, 0x03, 0x00, 0x00,                                                                    // mov	edx, 1023
     0x4c, 0x89, 0xf7,                                                                                // mov	rdi, r14
     0x4c, 0x89, 0xe6,                                                                                // mov	rsi, r12
-    0xe8, 0x82, 0xf9, 0xff, 0xff,                                                                    // call	strncpy
+    0xe8, 0x62, 0xfa, 0xff, 0xff,                                                                    // call	strncpy
     0x4c, 0x89, 0xf7,                                                                                // mov	rdi, r14
-    0xe8, 0xcd, 0xf8, 0xff, 0xff,                                                                    // call	strlen
+    0xe8, 0xad, 0xf9, 0xff, 0xff,                                                                    // call	strlen
     0x48, 0x85, 0xc0,                                                                                // test	rax, rax
-    0x74, 0x17,                                                                                      // je	L_BB9_3
-                                                                                                     // L_BB9_1:
+    0x74, 0x17,                                                                                      // je	L_BB8_3
+                                                                                                     // L_BB8_1:
     0x80, 0xbc, 0x05, 0xdc, 0xf3, 0xff, 0xff, 0x0a,                                                  // cmp	byte ptr [rbp + rax - 3108], 10
-    0x75, 0x0d,                                                                                      // jne	L_BB9_3
+    0x75, 0x0d,                                                                                      // jne	L_BB8_3
     0xc6, 0x84, 0x05, 0xdc, 0xf3, 0xff, 0xff, 0x00,                                                  // mov	byte ptr [rbp + rax - 3108], 0
     0x48, 0xff, 0xc8,                                                                                // dec	rax
-    0x75, 0xe9,                                                                                      // jne	L_BB9_1
-                                                                                                     // L_BB9_3:
+    0x75, 0xe9,                                                                                      // jne	L_BB8_1
+                                                                                                     // L_BB8_3:
     0x4d, 0x85, 0xff,                                                                                // test	r15, r15
-    0x74, 0x11,                                                                                      // je	L_BB9_4
+    0x74, 0x11,                                                                                      // je	L_BB8_4
     0x41, 0x80, 0x3f, 0x00,                                                                          // cmp	byte ptr [r15], 0
-    0x48, 0x8d, 0x35, 0x98, 0x06, 0x00, 0x00,                                                        // lea	rsi, [rip + L_.str.6]
+    0x48, 0x8d, 0x35, 0x61, 0x07, 0x00, 0x00,                                                        // lea	rsi, [rip + L_.str.6]
     0x49, 0x0f, 0x45, 0xf7,                                                                          // cmovne	rsi, r15
-    0xeb, 0x07,                                                                                      // jmp	L_BB9_6
-                                                                                                     // L_BB9_4:
-    0x48, 0x8d, 0x35, 0x8b, 0x06, 0x00, 0x00,                                                        // lea	rsi, [rip + L_.str.6]
-                                                                                                     // L_BB9_6:
-    0x48, 0x8d, 0x3d, 0x75, 0x06, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.5]
+    0xeb, 0x07,                                                                                      // jmp	L_BB8_6
+                                                                                                     // L_BB8_4:
+    0x48, 0x8d, 0x35, 0x54, 0x07, 0x00, 0x00,                                                        // lea	rsi, [rip + L_.str.6]
+                                                                                                     // L_BB8_6:
+    0x48, 0x8d, 0x3d, 0x3e, 0x07, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.5]
     0x4c, 0x89, 0xf2,                                                                                // mov	rdx, r14
     0x31, 0xc0,                                                                                      // xor	eax, eax
-    0xe8, 0x77, 0xf8, 0xff, 0xff,                                                                    // call	printf
+    0xe8, 0x57, 0xf9, 0xff, 0xff,                                                                    // call	printf
     0x84, 0xdb,                                                                                      // test	bl, bl
-    0x74, 0x15,                                                                                      // je	L_BB9_8
+    0x74, 0x15,                                                                                      // je	L_BB8_8
     0x48, 0x8d, 0xb5, 0xb0, 0xf3, 0xff, 0xff,                                                        // lea	rsi, [rbp - 3152]
     0xba, 0x30, 0x0c, 0x00, 0x00,                                                                    // mov	edx, 3120
     0x31, 0xff,                                                                                      // xor	edi, edi
     0x31, 0xc9,                                                                                      // xor	ecx, ecx
-    0xe8, 0x76, 0xf8, 0xff, 0xff,                                                                    // call	sceKernelSendNotificationRequest
-                                                                                                     // L_BB9_8:
+    0xe8, 0x56, 0xf9, 0xff, 0xff,                                                                    // call	sceKernelSendNotificationRequest
+                                                                                                     // L_BB8_8:
     0x48, 0x81, 0xc4, 0x30, 0x0c, 0x00, 0x00,                                                        // add	rsp, 3120
+    0x5b,                                                                                            // pop	rbx
+    0x41, 0x5c,                                                                                      // pop	r12
+    0x41, 0x5e,                                                                                      // pop	r14
+    0x41, 0x5f,                                                                                      // pop	r15
+    0x5d,                                                                                            // pop	rbp
+    0xc3,                                                                                            // ret
+                                                                                                     // notify_:
+    0x55,                                                                                            // push	rbp
+    0x48, 0x89, 0xe5,                                                                                // mov	rbp, rsp
+    0x41, 0x57,                                                                                      // push	r15
+    0x41, 0x56,                                                                                      // push	r14
+    0x41, 0x54,                                                                                      // push	r12
+    0x53,                                                                                            // push	rbx
+    0x48, 0x81, 0xec, 0xd0, 0x04, 0x00, 0x00,                                                        // sub	rsp, 1232
+    0x49, 0x89, 0xd7,                                                                                // mov	r15, rdx
+    0x48, 0x89, 0xf3,                                                                                // mov	rbx, rsi
+    0x41, 0x89, 0xfe,                                                                                // mov	r14d, edi
+    0x48, 0x89, 0x8d, 0x28, 0xff, 0xff, 0xff,                                                        // mov	qword ptr [rbp - 216], rcx
+    0x4c, 0x89, 0x85, 0x30, 0xff, 0xff, 0xff,                                                        // mov	qword ptr [rbp - 208], r8
+    0x4c, 0x89, 0x8d, 0x38, 0xff, 0xff, 0xff,                                                        // mov	qword ptr [rbp - 200], r9
+    0x84, 0xc0,                                                                                      // test	al, al
+    0x74, 0x2c,                                                                                      // je	L_BB9_2
+    0x0f, 0x29, 0x85, 0x40, 0xff, 0xff, 0xff,                                                        // movaps	xmmword ptr [rbp - 192], xmm0
+    0x0f, 0x29, 0x8d, 0x50, 0xff, 0xff, 0xff,                                                        // movaps	xmmword ptr [rbp - 176], xmm1
+    0x0f, 0x29, 0x95, 0x60, 0xff, 0xff, 0xff,                                                        // movaps	xmmword ptr [rbp - 160], xmm2
+    0x0f, 0x29, 0x9d, 0x70, 0xff, 0xff, 0xff,                                                        // movaps	xmmword ptr [rbp - 144], xmm3
+    0x0f, 0x29, 0x65, 0x80,                                                                          // movaps	xmmword ptr [rbp - 128], xmm4
+    0x0f, 0x29, 0x6d, 0x90,                                                                          // movaps	xmmword ptr [rbp - 112], xmm5
+    0x0f, 0x29, 0x75, 0xa0,                                                                          // movaps	xmmword ptr [rbp - 96], xmm6
+    0x0f, 0x29, 0x7d, 0xb0,                                                                          // movaps	xmmword ptr [rbp - 80], xmm7
+                                                                                                     // L_BB9_2:
+    0x4c, 0x8d, 0xa5, 0x10, 0xfb, 0xff, 0xff,                                                        // lea	r12, [rbp - 1264]
+    0xba, 0x00, 0x04, 0x00, 0x00,                                                                    // mov	edx, 1024
+    0x4c, 0x89, 0xe7,                                                                                // mov	rdi, r12
+    0x31, 0xf6,                                                                                      // xor	esi, esi
+    0xe8, 0xa0, 0xf8, 0xff, 0xff,                                                                    // call	memset
+    0x48, 0x8d, 0x85, 0x10, 0xff, 0xff, 0xff,                                                        // lea	rax, [rbp - 240]
+    0x48, 0x89, 0x45, 0xd0,                                                                          // mov	qword ptr [rbp - 48], rax
+    0x48, 0x8d, 0x45, 0x10,                                                                          // lea	rax, [rbp + 16]
+    0x48, 0x89, 0x45, 0xc8,                                                                          // mov	qword ptr [rbp - 56], rax
+    0x48, 0xb8, 0x18, 0x00, 0x00, 0x00, 0x30, 0x00, 0x00, 0x00,                                      // movabs	rax, 206158430232
+    0x48, 0x89, 0x45, 0xc0,                                                                          // mov	qword ptr [rbp - 64], rax
+    0x48, 0x8d, 0x4d, 0xc0,                                                                          // lea	rcx, [rbp - 64]
+    0xbe, 0xff, 0x03, 0x00, 0x00,                                                                    // mov	esi, 1023
+    0x4c, 0x89, 0xe7,                                                                                // mov	rdi, r12
+    0x4c, 0x89, 0xfa,                                                                                // mov	rdx, r15
+    0xe8, 0x77, 0xf8, 0xff, 0xff,                                                                    // call	vsnprintf
+    0x44, 0x89, 0xf7,                                                                                // mov	edi, r14d
+    0x48, 0x89, 0xde,                                                                                // mov	rsi, rbx
+    0x4c, 0x89, 0xe2,                                                                                // mov	rdx, r12
+    0xe8, 0x7e, 0xfe, 0xff, 0xff,                                                                    // call	notify_fixed_
+    0x48, 0x81, 0xc4, 0xd0, 0x04, 0x00, 0x00,                                                        // add	rsp, 1232
     0x5b,                                                                                            // pop	rbx
     0x41, 0x5c,                                                                                      // pop	r12
     0x41, 0x5e,                                                                                      // pop	r14
@@ -674,9 +668,9 @@ static const unsigned char shellcode[] = {
     0x48, 0x89, 0xd3,                                                                                // mov	rbx, rdx
     0x49, 0x89, 0xf6,                                                                                // mov	r14, rsi
     0x49, 0x89, 0xff,                                                                                // mov	r15, rdi
-    0xe8, 0xd7, 0xf8, 0xff, 0xff,                                                                    // call	__error
+    0xe8, 0xee, 0xf8, 0xff, 0xff,                                                                    // call	__error
     0x8b, 0x38,                                                                                      // mov	edi, dword ptr [rax]
-    0xe8, 0xdc, 0xf8, 0xff, 0xff,                                                                    // call	strerror
+    0xe8, 0xf3, 0xf8, 0xff, 0xff,                                                                    // call	strerror
     0x48, 0x8d, 0x15, 0x33, 0x06, 0x00, 0x00,                                                        // lea	rdx, [rip + L_.str.7]
     0xbf, 0x01, 0x00, 0x00, 0x00,                                                                    // mov	edi, 1
     0x48, 0x89, 0xde,                                                                                // mov	rsi, rbx
@@ -689,7 +683,7 @@ static const unsigned char shellcode[] = {
     0x41, 0x5e,                                                                                      // pop	r14
     0x41, 0x5f,                                                                                      // pop	r15
     0x5d,                                                                                            // pop	rbp
-    0xe9, 0x88, 0xfd, 0xff, 0xff,                                                                    // jmp	notify_
+    0xe9, 0xef, 0xfe, 0xff, 0xff,                                                                    // jmp	notify_
                                                                                                      // match_line_in_file:
     0x55,                                                                                            // push	rbp
     0x48, 0x89, 0xe5,                                                                                // mov	rbp, rsp
@@ -702,7 +696,7 @@ static const unsigned char shellcode[] = {
     0x49, 0x89, 0xf5,                                                                                // mov	r13, rsi
     0x49, 0x89, 0xfe,                                                                                // mov	r14, rdi
     0x48, 0x8d, 0x35, 0xfa, 0x05, 0x00, 0x00,                                                        // lea	rsi, [rip + L_.str.8]
-    0xe8, 0x98, 0xf7, 0xff, 0xff,                                                                    // call	fopen
+    0xe8, 0xaf, 0xf7, 0xff, 0xff,                                                                    // call	fopen
     0x48, 0x85, 0xc0,                                                                                // test	rax, rax
     0x0f, 0x84, 0x9a, 0x00, 0x00, 0x00,                                                              // je	L_BB11_1
     0x48, 0x89, 0xc3,                                                                                // mov	rbx, rax
@@ -711,9 +705,9 @@ static const unsigned char shellcode[] = {
     0xba, 0x01, 0x04, 0x00, 0x00,                                                                    // mov	edx, 1025
     0x4c, 0x89, 0xf7,                                                                                // mov	rdi, r14
     0x31, 0xf6,                                                                                      // xor	esi, esi
-    0xe8, 0xa3, 0xf7, 0xff, 0xff,                                                                    // call	memset
+    0xe8, 0xba, 0xf7, 0xff, 0xff,                                                                    // call	memset
     0x4c, 0x89, 0xef,                                                                                // mov	rdi, r13
-    0xe8, 0xbf, 0xf7, 0xff, 0xff,                                                                    // call	strlen
+    0xe8, 0xd6, 0xf7, 0xff, 0xff,                                                                    // call	strlen
     0x49, 0x89, 0xc4,                                                                                // mov	r12, rax
     0x4c, 0x89, 0xef,                                                                                // mov	rdi, r13
     0x48, 0x89, 0xc6,                                                                                // mov	rsi, rax
@@ -722,7 +716,7 @@ static const unsigned char shellcode[] = {
     0x4c, 0x89, 0xf7,                                                                                // mov	rdi, r14
     0xbe, 0x00, 0x04, 0x00, 0x00,                                                                    // mov	esi, 1024
     0x48, 0x89, 0xda,                                                                                // mov	rdx, rbx
-    0xe8, 0xce, 0xf7, 0xff, 0xff,                                                                    // call	fgets
+    0xe8, 0xe5, 0xf7, 0xff, 0xff,                                                                    // call	fgets
     0x48, 0x85, 0xc0,                                                                                // test	rax, rax
     0x74, 0x6f,                                                                                      // je	L_BB11_12
     0x4d, 0x89, 0xf7,                                                                                // mov	r15, r14
@@ -738,7 +732,7 @@ static const unsigned char shellcode[] = {
     0x83, 0xf8, 0x20,                                                                                // cmp	eax, 32
     0x74, 0xea,                                                                                      // je	L_BB11_7
     0x4c, 0x89, 0xff,                                                                                // mov	rdi, r15
-    0xe8, 0x0a, 0xf7, 0xff, 0xff,                                                                    // call	puts
+    0xe8, 0x21, 0xf7, 0xff, 0xff,                                                                    // call	puts
     0x4c, 0x89, 0xff,                                                                                // mov	rdi, r15
     0x4c, 0x89, 0xe6,                                                                                // mov	rsi, r12
     0xe8, 0x5e, 0x00, 0x00, 0x00,                                                                    // call	_ZL10stringid_lPKcl
@@ -748,7 +742,7 @@ static const unsigned char shellcode[] = {
     0x4c, 0x89, 0xf7,                                                                                // mov	rdi, r14
     0xbe, 0x00, 0x04, 0x00, 0x00,                                                                    // mov	esi, 1024
     0x48, 0x89, 0xda,                                                                                // mov	rdx, rbx
-    0xe8, 0x86, 0xf7, 0xff, 0xff,                                                                    // call	fgets
+    0xe8, 0x9d, 0xf7, 0xff, 0xff,                                                                    // call	fgets
     0x4d, 0x89, 0xf7,                                                                                // mov	r15, r14
     0x48, 0x85, 0xc0,                                                                                // test	rax, rax
     0x75, 0xbd,                                                                                      // jne	L_BB11_4
@@ -758,14 +752,14 @@ static const unsigned char shellcode[] = {
     0x48, 0x8d, 0x3d, 0x4e, 0x05, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.9]
     0x4c, 0x89, 0xf6,                                                                                // mov	rsi, r14
     0x31, 0xc0,                                                                                      // xor	eax, eax
-    0xe8, 0x2c, 0xf7, 0xff, 0xff,                                                                    // call	printf
+    0xe8, 0x43, 0xf7, 0xff, 0xff,                                                                    // call	printf
     0x41, 0xbf, 0xf1, 0xff, 0xff, 0xff,                                                              // mov	r15d, -15
     0xeb, 0x0e,                                                                                      // jmp	L_BB11_13
                                                                                                      // L_BB11_9:
     0x41, 0xbf, 0x01, 0x00, 0x00, 0x00,                                                              // mov	r15d, 1
                                                                                                      // L_BB11_12:
     0x48, 0x89, 0xdf,                                                                                // mov	rdi, rbx
-    0xe8, 0xe6, 0xf6, 0xff, 0xff,                                                                    // call	fclose
+    0xe8, 0xfd, 0xf6, 0xff, 0xff,                                                                    // call	fclose
                                                                                                      // L_BB11_13:
     0x44, 0x89, 0xf8,                                                                                // mov	eax, r15d
     0x48, 0x81, 0xc4, 0x08, 0x04, 0x00, 0x00,                                                        // add	rsp, 1032
@@ -876,7 +870,7 @@ static const unsigned char shellcode[] = {
     0xbf, 0x02, 0x00, 0x00, 0x00,                                                                    // mov	edi, 2
     0xbe, 0x01, 0x00, 0x00, 0x00,                                                                    // mov	esi, 1
     0x31, 0xd2,                                                                                      // xor	edx, edx
-    0xe8, 0x41, 0xf6, 0xff, 0xff,                                                                    // call	socket
+    0xe8, 0x58, 0xf6, 0xff, 0xff,                                                                    // call	socket
     0x41, 0x89, 0xc6,                                                                                // mov	r14d, eax
     0x85, 0xc0,                                                                                      // test	eax, eax
     0x0f, 0x88, 0x03, 0x01, 0x00, 0x00,                                                              // js	L_BB15_2
@@ -887,27 +881,27 @@ static const unsigned char shellcode[] = {
     0xbf, 0x02, 0x00, 0x00, 0x00,                                                                    // mov	edi, 2
     0x48, 0x8d, 0x35, 0xac, 0x06, 0x00, 0x00,                                                        // lea	rsi, [rip + L_.str.30]
     0x48, 0x8d, 0x55, 0xc4,                                                                          // lea	rdx, [rbp - 60]
-    0xe8, 0x58, 0xf6, 0xff, 0xff,                                                                    // call	__inet_pton
+    0xe8, 0x6f, 0xf6, 0xff, 0xff,                                                                    // call	__inet_pton
     0x44, 0x89, 0xf7,                                                                                // mov	edi, r14d
     0x4c, 0x89, 0xee,                                                                                // mov	rsi, r13
     0xba, 0x10, 0x00, 0x00, 0x00,                                                                    // mov	edx, 16
-    0xe8, 0x18, 0xf6, 0xff, 0xff,                                                                    // call	connect
+    0xe8, 0x2f, 0xf6, 0xff, 0xff,                                                                    // call	connect
     0x85, 0xc0,                                                                                      // test	eax, eax
     0x79, 0x63,                                                                                      // jns	L_BB15_4
     0x41, 0x89, 0xc7,                                                                                // mov	r15d, eax
     0x48, 0x8d, 0x3d, 0x8d, 0x06, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.31]
-    0xe8, 0xc4, 0xf5, 0xff, 0xff,                                                                    // call	perror
+    0xe8, 0xdb, 0xf5, 0xff, 0xff,                                                                    // call	perror
     0x48, 0x8d, 0x3d, 0xc6, 0x06, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.32]
     0x44, 0x89, 0xfe,                                                                                // mov	esi, r15d
     0x44, 0x89, 0xfa,                                                                                // mov	edx, r15d
     0x31, 0xc0,                                                                                      // xor	eax, eax
-    0xe8, 0x8c, 0xf5, 0xff, 0xff,                                                                    // call	printf
+    0xe8, 0xa3, 0xf5, 0xff, 0xff,                                                                    // call	printf
     0x48, 0x8d, 0x3d, 0xe5, 0x09, 0x00, 0x00,                                                        // lea	rdi, [rip + L_str.52]
-    0xe8, 0x20, 0xf5, 0xff, 0xff,                                                                    // call	puts
+    0xe8, 0x37, 0xf5, 0xff, 0xff,                                                                    // call	puts
     0x44, 0x89, 0xf7,                                                                                // mov	edi, r14d
-    0xe8, 0xe9, 0xf5, 0xff, 0xff,                                                                    // call	close
+    0xe8, 0x00, 0xf6, 0xff, 0xff,                                                                    // call	close
     0xbf, 0x40, 0x42, 0x0f, 0x00,                                                                    // mov	edi, 1000000
-    0xe8, 0x1a, 0xf5, 0xff, 0xff,                                                                    // call	usleep
+    0xe8, 0x31, 0xf5, 0xff, 0xff,                                                                    // call	usleep
     0x49, 0xff, 0xcc,                                                                                // dec	r12
     0x0f, 0x85, 0x60, 0xff, 0xff, 0xff,                                                              // jne	L_BB15_1
     0x8b, 0x0b,                                                                                      // mov	ecx, dword ptr [rbx]
@@ -915,32 +909,32 @@ static const unsigned char shellcode[] = {
     0xbf, 0x01, 0x00, 0x00, 0x00,                                                                    // mov	edi, 1
     0x31, 0xf6,                                                                                      // xor	esi, esi
     0x31, 0xc0,                                                                                      // xor	eax, eax
-    0xe8, 0xd0, 0xfa, 0xff, 0xff,                                                                    // call	notify_
+    0xe8, 0x37, 0xfc, 0xff, 0xff,                                                                    // call	notify_
     0xeb, 0x57,                                                                                      // jmp	L_BB15_9
                                                                                                      // L_BB15_4:
     0xba, 0x0c, 0x00, 0x00, 0x00,                                                                    // mov	edx, 12
     0x44, 0x89, 0xf7,                                                                                // mov	edi, r14d
     0x48, 0x89, 0xde,                                                                                // mov	rsi, rbx
     0x31, 0xc9,                                                                                      // xor	ecx, ecx
-    0xe8, 0xc3, 0xf5, 0xff, 0xff,                                                                    // call	send
+    0xe8, 0xda, 0xf5, 0xff, 0xff,                                                                    // call	send
     0xc7, 0x43, 0x08, 0x00, 0x00, 0x00, 0x00,                                                        // mov	dword ptr [rbx + 8], 0
     0xba, 0x0c, 0x00, 0x00, 0x00,                                                                    // mov	edx, 12
     0x44, 0x89, 0xf7,                                                                                // mov	edi, r14d
     0x48, 0x89, 0xde,                                                                                // mov	rsi, rbx
     0x31, 0xc9,                                                                                      // xor	ecx, ecx
-    0xe8, 0x9e, 0xf5, 0xff, 0xff,                                                                    // call	recv
+    0xe8, 0xb5, 0xf5, 0xff, 0xff,                                                                    // call	recv
     0x8b, 0x5b, 0x08,                                                                                // mov	ebx, dword ptr [rbx + 8]
     0x48, 0x8d, 0x3d, 0xf2, 0x06, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.34]
     0x89, 0xde,                                                                                      // mov	esi, ebx
     0x31, 0xc0,                                                                                      // xor	eax, eax
-    0xe8, 0x0e, 0xf5, 0xff, 0xff,                                                                    // call	printf
+    0xe8, 0x25, 0xf5, 0xff, 0xff,                                                                    // call	printf
     0x83, 0xfb, 0x01,                                                                                // cmp	ebx, 1
     0x75, 0x0c,                                                                                      // jne	L_BB15_6
     0x48, 0x8d, 0x3d, 0x44, 0x09, 0x00, 0x00,                                                        // lea	rdi, [rip + L_str.51]
-    0xe8, 0x9d, 0xf4, 0xff, 0xff,                                                                    // call	puts
+    0xe8, 0xb4, 0xf4, 0xff, 0xff,                                                                    // call	puts
                                                                                                      // L_BB15_6:
     0x44, 0x89, 0xf7,                                                                                // mov	edi, r14d
-    0xe8, 0x66, 0xf5, 0xff, 0xff,                                                                    // call	close
+    0xe8, 0x7d, 0xf5, 0xff, 0xff,                                                                    // call	close
                                                                                                      // L_BB15_9:
     0x48, 0x83, 0xc4, 0x18,                                                                          // add	rsp, 24
     0x5b,                                                                                            // pop	rbx
@@ -952,12 +946,12 @@ static const unsigned char shellcode[] = {
     0xc3,                                                                                            // ret
                                                                                                      // L_BB15_2:
     0x48, 0x8d, 0x3d, 0x4d, 0x04, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.25]
-    0xe8, 0xfe, 0xf4, 0xff, 0xff,                                                                    // call	perror
+    0xe8, 0x15, 0xf5, 0xff, 0xff,                                                                    // call	perror
     0x48, 0x8d, 0x3d, 0x75, 0x04, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.26]
     0x44, 0x89, 0xf6,                                                                                // mov	esi, r14d
     0x44, 0x89, 0xf2,                                                                                // mov	edx, r14d
     0x31, 0xc0,                                                                                      // xor	eax, eax
-    0xe8, 0xc6, 0xf4, 0xff, 0xff,                                                                    // call	printf
+    0xe8, 0xdd, 0xf4, 0xff, 0xff,                                                                    // call	printf
     0x48, 0x8d, 0x3d, 0xfd, 0x04, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.27]
     0x48, 0x8d, 0x35, 0xfd, 0x04, 0x00, 0x00,                                                        // lea	rsi, [rip + L_.str.28]
     0x48, 0x8d, 0x15, 0x29, 0x05, 0x00, 0x00,                                                        // lea	rdx, [rip + L_.str.29]
@@ -1001,7 +995,7 @@ static const unsigned char shellcode[] = {
     0x48, 0x8d, 0x55, 0xf0,                                                                          // lea	rdx, [rbp - 16]
     0xbe, 0x08, 0x00, 0x00, 0x00,                                                                    // mov	esi, 8
     0xbf, 0x01, 0x20, 0x00, 0x00,                                                                    // mov	edi, 8193
-    0xe8, 0xf9, 0xf4, 0xff, 0xff,                                                                    // call	dynlib_get_obj_member
+    0xe8, 0x10, 0xf5, 0xff, 0xff,                                                                    // call	dynlib_get_obj_member
     0x85, 0xc0,                                                                                      // test	eax, eax
     0x75, 0x1b,                                                                                      // jne	L_BB18_2
     0x48, 0x8b, 0x45, 0xf0,                                                                          // mov	rax, qword ptr [rbp - 16]
@@ -1018,12 +1012,12 @@ static const unsigned char shellcode[] = {
                                                                                                      // L_BB18_2:
     0x48, 0x8d, 0x3d, 0x7f, 0x06, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.37]
     0x89, 0xc3,                                                                                      // mov	ebx, eax
-    0xe8, 0x2b, 0xf4, 0xff, 0xff,                                                                    // call	perror
+    0xe8, 0x42, 0xf4, 0xff, 0xff,                                                                    // call	perror
     0x48, 0x8d, 0x3d, 0xbd, 0x06, 0x00, 0x00,                                                        // lea	rdi, [rip + L_.str.38]
     0x89, 0xde,                                                                                      // mov	esi, ebx
     0x89, 0xda,                                                                                      // mov	edx, ebx
     0x31, 0xc0,                                                                                      // xor	eax, eax
-    0xe8, 0xf5, 0xf3, 0xff, 0xff,                                                                    // call	printf
+    0xe8, 0x0c, 0xf4, 0xff, 0xff,                                                                    // call	printf
     0xeb, 0xd7,                                                                                      // jmp	L_BB18_5
                                                                                                      // L_.str:
     0x6f, 0x6e, 0x4e, 0x65, 0x77, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x5f, 0x68, 0x6f, 0x6f, 0x6b, 0x20, 0x63, 0x61, 0x6c, 0x6c, 0x65, 0x64, 0x21, 0x20, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x5f, 0x33, 0x2d, 0x3e, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x50, 0x69, 0x64, 0x3a, 0x20, 0x25, 0x64, 0x0a, 0x00,  // .asciz	"onNewProcess_hook called! param_3->clientPid: %d\n"
