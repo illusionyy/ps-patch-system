@@ -5,7 +5,6 @@ App patching system for PS4/PS5.
 ![](https://github.com/user-attachments/assets/fd047e71-391e-46d2-91a8-5bde99dfdf7d)
 
 - (Yes, I really commissioned an artist for this)
-
 <details><summary>
 
 ### Screenshots (PS4)
@@ -55,14 +54,6 @@ Checkout branch `df-demo-550`. only for 5.50 PS5 retail, nothing else!
 
 # Credits
 
-- [Not An Energy Drink Addict](https://github.com/notanenergydrinkaddict) for Kurisu Render
-  - Assets:
-    - [Makise Kurisu](https://scienceadventure.wiki.gg/wiki/Makise_Kurisu) from [Steins;Gate](https://scienceadventure.wiki.gg/wiki/Steins;Gate_(visual_novel))
-    - [PS5 Model](https://sketchfab.com/3d-models/ps5-d788de3735964151a3e24fd59c0f1956) from rtql8d at Sketchfab
-    - ```
-      "PS5" (https://sketchfab.com/3d-models/ps5-d788de3735964151a3e24fd59c0f1956) by rtql8d
-      is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
-      ```
 - [John Törnblom](https://github.com/john-tornblom)
   - [PS4](https://github.com/ps4-payload-dev/sdk) and [PS5](https://github.com/ps5-payload-dev/sdk) Payload SDK
   - [`sigqueue`](shared/sigqueue.c) implementation
@@ -70,3 +61,11 @@ Checkout branch `df-demo-550`. only for 5.50 PS5 retail, nothing else!
 - [idlesauce](https://github.com/idlesauce)
   - [`proc_rw`](shared/proc_rw.c) memory write trick used in firmware 8.20+ on PS5.
 - [fast-lzma2 + contributors](https://github.com/conor42/fast-lzma2) compression library
+- [Not An Energy Drink Addict](https://github.com/notanenergydrinkaddict) for cover image
+  - Assets:
+    - [Makise Kurisu](https://scienceadventure.wiki.gg/wiki/Makise_Kurisu) from [Steins;Gate](https://scienceadventure.wiki.gg/wiki/Steins;Gate_(visual_novel))
+    - [PS5 Model](https://sketchfab.com/3d-models/ps5-d788de3735964151a3e24fd59c0f1956) from rtql8d at Sketchfab
+    - ```
+      "PS5" (https://sketchfab.com/3d-models/ps5-d788de3735964151a3e24fd59c0f1956) by rtql8d
+      is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+      ```
