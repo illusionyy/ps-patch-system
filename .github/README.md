@@ -45,6 +45,7 @@ App patching system for PS4/PS5.
 - Extract and upload [patch1.zip](https://github.com/illusionyy/PS-Game-Patch/releases/latest) xml files to `/data/user/patches`
   - `xml_orbis` for PS4 Game Patches
   - `xml_prospero` for PS5 Game Patches
+- On PS5, Open options menu and select "Keep in Home" to keep this icon on the home screen. If you forget, uninstall the shortcut and re-send payload to add the shortcut back.
 - Open webpage at `127.0.0.1:23900` or console IP on another device.
 - Apply patches and they should work!
 
