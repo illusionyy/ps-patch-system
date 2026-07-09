@@ -4,6 +4,8 @@
 #include "macro.h"
 #include <sys/cdefs.h>
 
+#include "shellcore_attr.h"
+
 typedef struct metadata_buf
 {
     char title_id[16];
@@ -11,6 +13,7 @@ typedef struct metadata_buf
     char app_version[16];
     char title[128];
     char content_id[64];
+    struct attr attributes;
 } metadata_buf;
 
 __BEGIN_DECLS
