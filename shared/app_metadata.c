@@ -12,6 +12,7 @@ int get_app_metadata_(const pid_t pid, metadata_buf* buf, const char* user)
     app_info_t app;
     memset(&app, 0, sizeof(app));
     extern int sceShellCoreUtilGetAppLaunchedParamString(const uint32_t appid, const char* key, char* out, size_t out_sz);
+    extern int sceShellCoreUtilGetAppLaunchedParamInt(const uint32_t appid, const char* key, uint32_t* out);
     int s = 0;
     s |= sceKernelGetAppInfo(pid, &app);
     const uint32_t u = app.app_id;
@@ -21,6 +22,10 @@ int get_app_metadata_(const pid_t pid, metadata_buf* buf, const char* user)
     s |= sceShellCoreUtilGetAppLaunchedParamString(u, "APP_VER", buf->app_version, sizeof(buf->app_version));
     s |= sceShellCoreUtilGetAppLaunchedParamString(u, "TITLE", buf->title, sizeof(buf->title));
     s |= sceShellCoreUtilGetAppLaunchedParamString(u, "CONTENT_ID", buf->content_id, sizeof(buf->content_id));
+    sceShellCoreUtilGetAppLaunchedParamInt(u, "ATTRIBUTE", &buf->attributes.ATTRIBUTE.v);
+    sceShellCoreUtilGetAppLaunchedParamInt(u, "ATTRIBUTE2", &buf->attributes.ATTRIBUTE2.v);
+    sceShellCoreUtilGetAppLaunchedParamInt(u, "ATTRIBUTE3", &buf->attributes.ATTRIBUTE3.v);
+    sceShellCoreUtilGetAppLaunchedParamInt(u, "ATTRIBUTE4", &buf->attributes.ATTRIBUTE4.v);
     // fallback for native app, this is the only version field available
     if (!*buf->app_version)
     {
