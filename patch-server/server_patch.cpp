@@ -164,6 +164,9 @@ static void run_prx_load_patch(const client_data& read_client, const uint32_t id
     dynlib_list info_list = {};
     const int rf = kernel_dynlib_info2(read_client.clientPid, 0, &info_list.first);
     const ssize_t module_count = (ssize_t)kernel_dynlib_handle_list(read_client.clientPid, modules, _countof(modules));
+    metadata_buf meta = {};
+    get_app_metadata(read_client.clientPid, &meta);
+    (void)meta;
     if (rf == 0 && module_count > 0)
     {
 #if defined(__PROSPERO__)
