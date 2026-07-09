@@ -43,12 +43,12 @@ int main()
     int pid = 0;
     argv[0] = basename(patch_server_elf_path);
     func_ret(pid = elfldr_spawn(console_fd, (char* const*)argv, (uint8_t*)patch_server_elf_data, sizeof(patch_server_elf_data)));
-    print_load_constexpr(notify, argv[0], pid, sizeof(patch_server_elf_data));
+    print_load_constexpr(printf, argv[0], pid, sizeof(patch_server_elf_data));
     argv[0] = basename(patch_elf_path);
     func_ret(pid = elfldr_spawn(console_fd, (char* const*)argv, (uint8_t*)patch_elf_data, sizeof(patch_elf_data)));
-    print_load_constexpr(notify, argv[0], pid, sizeof(patch_elf_data));
+    print_load_constexpr(printf, argv[0], pid, sizeof(patch_elf_data));
     argv[0] = basename(patch_web_elf_path);
     func_ret(pid = elfldr_spawn(console_fd, (char* const*)argv, (uint8_t*)patch_web_elf_data, sizeof(patch_web_elf_data)));
-    print_load_constexpr(notify, argv[0], pid, sizeof(patch_web_elf_data));
+    print_load_constexpr(printf, argv[0], pid, sizeof(patch_web_elf_data));
     return 0;
 }
