@@ -235,9 +235,17 @@ static void run_prx_load_patch(const client_data& read_client, const uint32_t id
     }
 }
 
+static bool has_libkernel_sys(const pid_t pid)
+{
+    // kernel check for eh_frame tampering, not okay!
+    uint32_t h = 0;
+    kernel_dynlib_handle(pid, "libkernel_sys.sprx", &h);
+    return h == 0;
+}
+
 void run_elf_user_patch(client_data& read_client)
 {
-    const bool enable_prx_patch = true;
+    const bool enable_prx_patch = has_libkernel_sys(read_client.clientPid);
     app_info appinfo = {};
     dynlib_info info = {};
     const int r = kernel_dynlib_info2(read_client.clientPid, 0, &info);
@@ -257,6 +265,8 @@ void run_elf_user_patch(client_data& read_client)
 
         if (!is_forbidden_app(name_hash) && !is_forbidden_titleid(id_hash))
         {
+            if (enable_prx_patch)
+            {
             patch_frame_context libkernel_eh_frame_patch = {};
             kernel_dynlib_obj(read_client.clientPid, 0x2001, &libkernel_eh_frame_patch.frame_info.obj);
             if (!libkernel_eh_frame_patch.frame_info.obj.eh_frame || !libkernel_eh_frame_patch.frame_info.obj.eh_frame_size)
@@ -264,13 +274,14 @@ void run_elf_user_patch(client_data& read_client)
                 memset(&libkernel_eh_frame_patch, 0, sizeof(libkernel_eh_frame_patch));
                 kernel_dynlib_obj(read_client.clientPid, 0x1, &libkernel_eh_frame_patch.frame_info.obj);
             }
-            if (enable_prx_patch && libkernel_eh_frame_patch.frame_info.obj.eh_frame && libkernel_eh_frame_patch.frame_info.obj.eh_frame_size)
+            if (libkernel_eh_frame_patch.frame_info.obj.eh_frame && libkernel_eh_frame_patch.frame_info.obj.eh_frame_size)
             {
                 libkernel_eh_frame_patch.frame_start = libkernel_eh_frame_patch.frame_info.obj.eh_frame;
                 libkernel_eh_frame_patch.frame_size = libkernel_eh_frame_patch.frame_info.obj.eh_frame_size;
                 func_ret(kill(read_client.clientPid, SIGSTOP));
                 patch_prx_load_for_signal(libkernel_eh_frame_patch, read_client);
                 func_ret(kill(read_client.clientPid, SIGCONT));
+            }
             }
             metadata_buf meta = {};
             const int mr = get_app_metadata(read_client.clientPid, &meta);
