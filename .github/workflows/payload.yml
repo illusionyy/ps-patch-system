@@ -136,9 +136,6 @@ jobs:
     - name: Build shellcode
       run: bash host/shellcode_build.sh
 
-    - name: Diff
-      run: git diff > a && cat a && rm a
-
     - name: Build PS4 Payloads
       run: |
         p="$PWD" # define p so it can be copypasted into shell

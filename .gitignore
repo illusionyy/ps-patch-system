@@ -13,6 +13,10 @@ lldb.log
 **/*.log
 **/*.gen.txt
 
+patch-server/usermode_prx_load.h
+patch-server/videoout_120hz.h
+patch/shellcore_onNewProcess.h
+
 **/*.elf.*
 
 # archives
