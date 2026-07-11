@@ -77,6 +77,53 @@ static void patchAppTimeoutForMonitoredProcs(const dynlib_info* obj, const pid_t
 #endif
 }
 
+static void patchMountRoot(patch_frame_context* frame, const dynlib_info* obj, const pid_t pid)
+{
+#if defined(__PROSPERO__)
+    const uintptr_t mapbase = obj->obj.mapbase;
+    const size_t mapsize = obj->obj.mapsize;
+
+    uintptr_t timeout_branch = 0;
+    uintptr_t target_branch = 0;
+    char patch_buf[MAX_PATH + 1] = {};
+    const char* patten = "48 8d 35 ? ? ? ? 48 8d 15 ? ? ? ? 48 8d 0d ? ? ? ? 4c 8d 8d ? ? ? ? c7 85 ? ? ? ? ff ff ff ff 45 31 c0 c6 85 ? ? ? ? 00 e8 ? ? ? ?";
+    const size_t patten_offset = 48;
+    gen_backup_path(FUNC_N(0), patten, patten_offset, patch_buf, _countof_1(patch_buf));
+    make_backup_buf(sfo_backup, 6);
+    const bool is_ptr = false;
+    if (restore_cached_backup(pid, mapbase, patch_buf, &sfo_backup, sizeof(sfo_backup), sizeof(sfo_backup.bytes), &timeout_branch, is_ptr) == 1)
+    {
+        target_branch = timeout_branch;
+        debugf("timeout_branch cached %lx, target_branch from backup %lx\n", timeout_branch, target_branch);
+    }
+    else
+    {
+        timeout_branch = pid_chunk_scan(pid, mapbase, mapsize, patten, patten_offset);
+        debugf("timeout_branch: %lx\n", timeout_branch);
+        if (!timeout_branch)
+        {
+            notify("can't find mount root nya");
+            return;
+        }
+        target_branch = pid_read_call(pid, timeout_branch);
+    }
+
+    if (target_branch)
+    {
+        if (file_exists(patch_buf) == FAILED)
+        {
+            debugf("cache file not exist %s\n", patch_buf);
+            userland_copyout(pid, target_branch, sfo_backup.bytes, sizeof(sfo_backup.bytes));
+            sfo_backup.addr = target_branch - mapbase;
+            write_backup_to_disk(patch_buf, &sfo_backup, sizeof(sfo_backup));
+        }
+        const size_t num_originals = sizeof(sfo_backup.bytes);
+        pid_write_call(pid, target_branch, frame->frame_base + __export_mount_root_hook_offset, true);
+        pid_write_call(pid, frame->frame_base + (__export_mount_root_original_offset + num_originals), target_branch + num_originals, true);
+    }
+#endif
+}
+
 static void patchOnNewProcess(patch_frame_context* frame, const dynlib_info* obj, const pid_t pid)
 {
     if (!is_ps4)
@@ -202,6 +249,10 @@ static void patchOnNewProcess(patch_frame_context* frame, const dynlib_info* obj
         }
         const size_t nbytes = sizeof(code_copy);
         userland_copyin(pid, code_copy, codebase, nbytes);
+        if (!is_ps4)
+        {
+            patchMountRoot(frame, obj, pid);
+        }
         frame->frame_start += nbytes;
         frame->frame_consumed += nbytes;
         frame->frame_size -= nbytes;
