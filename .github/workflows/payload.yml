@@ -114,23 +114,21 @@ jobs:
           cd "$o"
           git clone https://github.com/imheresamir/keystone --depth 1
           cd "$o/keystone"
-          mkdir $b && cd $b
-          ../make-lib.sh lib_only
-          sudo make install
+          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DLLVM_TARGETS_TO_BUILD="X86" -B $b
+          time cmake --build $b
+          sudo make -C $b install
         fi
         if [ "${{ steps.cache-zydis.outputs.cache-hit }}" != "true" ]; then
           cd "$o"
           git clone https://github.com/zyantific/zydis.git --depth 1 --recursive
           cd "$o/zydis"
           cmake -B $b
-          cmake --build $b
-          cd $b
-          sudo make install
+          time cmake --build $b
+          sudo make -C $b install
           cd "$o/zydis/dependencies/zycore"
           cmake -B $b
-          cmake --build $b
-          cd $b
-          sudo make install
+          time cmake --build $b
+          sudo make -C $b install
         fi
 
     - name: Build shellcode
