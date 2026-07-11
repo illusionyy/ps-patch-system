@@ -582,6 +582,15 @@ jmp rax
 dynlib_get_obj_member:
 movabs rax, -1
 jmp rax
+__export_mount_root_original:
+PUSH RBP
+MOV RBP,RSP
+PUSH R15
+int3
+int3
+int3
+int3
+int3
 )";
     try
     {
