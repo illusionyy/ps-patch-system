@@ -13,8 +13,7 @@ __attribute__((noinline)) static size_t ConstStrLen(const char* str)
 }
 
 // runtime function to strstr by sid
-__attribute__((noinline))
-static const char*
+__attribute__((noinline)) static const char*
 StrStrSid(const char* haystackStr, const StringId needleSid, const size_t needleLen)
 {
     const size_t hlen = ConstStrLen(haystackStr);

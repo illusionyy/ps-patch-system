@@ -267,21 +267,21 @@ void run_elf_user_patch(client_data& read_client)
         {
             if (enable_prx_patch)
             {
-            patch_frame_context libkernel_eh_frame_patch = {};
-            kernel_dynlib_obj(read_client.clientPid, 0x2001, &libkernel_eh_frame_patch.frame_info.obj);
-            if (!libkernel_eh_frame_patch.frame_info.obj.eh_frame || !libkernel_eh_frame_patch.frame_info.obj.eh_frame_size)
-            {
-                memset(&libkernel_eh_frame_patch, 0, sizeof(libkernel_eh_frame_patch));
-                kernel_dynlib_obj(read_client.clientPid, 0x1, &libkernel_eh_frame_patch.frame_info.obj);
-            }
-            if (libkernel_eh_frame_patch.frame_info.obj.eh_frame && libkernel_eh_frame_patch.frame_info.obj.eh_frame_size)
-            {
-                libkernel_eh_frame_patch.frame_start = libkernel_eh_frame_patch.frame_info.obj.eh_frame;
-                libkernel_eh_frame_patch.frame_size = libkernel_eh_frame_patch.frame_info.obj.eh_frame_size;
-                func_ret(kill(read_client.clientPid, SIGSTOP));
-                patch_prx_load_for_signal(libkernel_eh_frame_patch, read_client);
-                func_ret(kill(read_client.clientPid, SIGCONT));
-            }
+                patch_frame_context libkernel_eh_frame_patch = {};
+                kernel_dynlib_obj(read_client.clientPid, 0x2001, &libkernel_eh_frame_patch.frame_info.obj);
+                if (!libkernel_eh_frame_patch.frame_info.obj.eh_frame || !libkernel_eh_frame_patch.frame_info.obj.eh_frame_size)
+                {
+                    memset(&libkernel_eh_frame_patch, 0, sizeof(libkernel_eh_frame_patch));
+                    kernel_dynlib_obj(read_client.clientPid, 0x1, &libkernel_eh_frame_patch.frame_info.obj);
+                }
+                if (libkernel_eh_frame_patch.frame_info.obj.eh_frame && libkernel_eh_frame_patch.frame_info.obj.eh_frame_size)
+                {
+                    libkernel_eh_frame_patch.frame_start = libkernel_eh_frame_patch.frame_info.obj.eh_frame;
+                    libkernel_eh_frame_patch.frame_size = libkernel_eh_frame_patch.frame_info.obj.eh_frame_size;
+                    func_ret(kill(read_client.clientPid, SIGSTOP));
+                    patch_prx_load_for_signal(libkernel_eh_frame_patch, read_client);
+                    func_ret(kill(read_client.clientPid, SIGCONT));
+                }
             }
             metadata_buf meta = {};
             const int mr = get_app_metadata(read_client.clientPid, &meta);
