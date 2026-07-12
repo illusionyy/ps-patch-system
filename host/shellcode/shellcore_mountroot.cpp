@@ -21,10 +21,10 @@ static bool is_valid_src_dst(const char* src, const char* dst)
     return valid_str(src) && valid_str(dst);
 }
 
-static bool is_avContents(const char* src, const char* dst)
+static bool is_validPathForMounting(const char* src, const char* dst)
 {
     return is_valid_src_dst(src, dst) &&
-           ConstStrStrId(src, "/user/av_contents/content_tmp") && ConstStrStrId(dst, "/av_contents/content_tmp");
+           ConstStrStrId(src, "/system_tmp") && ConstStrStrId(dst, "/system_tmp");
 }
 
 static bool is_userData(const char* src, const char* dst)
@@ -47,13 +47,14 @@ extern "C" int __export_mount_root_hook(void* pThis, const char* fs, const char*
     // check for pre patched environment
     if (is_userData(src, dst))
     {
-        printf("attempting to mount \"%s\" to \"%s\"! this is handled by \"mountUserData\" already!\n", src, dst);
+        debugf("attempting to mount \"%s\" to \"%s\"! this is handled by \"mountUserData\" already!\n", src, dst);
         return 0;
     }
     // not patched, mount data folder
-    if (is_avContents(src, dst))
+    if (is_validPathForMounting(src, dst))
     {
-        mountUserData(pThis, param_5, param_6);
+        const int r = mountUserData(pThis, param_5, param_6);
+        debugf("mountUserData: 0x%08x\n", r);
     }
     return __export_mount_root_original(pThis, fs, src, dst, param_5, param_6);
 }
