@@ -79,7 +79,6 @@ static void patchAppTimeoutForMonitoredProcs(const dynlib_info* obj, const pid_t
 
 static void patchMountRoot(patch_frame_context* frame, const dynlib_info* obj, const pid_t pid)
 {
-#if defined(__PROSPERO__)
     const uintptr_t mapbase = obj->obj.mapbase;
     const size_t mapsize = obj->obj.mapsize;
 
@@ -121,7 +120,6 @@ static void patchMountRoot(patch_frame_context* frame, const dynlib_info* obj, c
         pid_write_call(pid, target_branch, frame->frame_base + __export_mount_root_hook_offset, true);
         pid_write_call(pid, frame->frame_base + (__export_mount_root_original_offset + num_originals), target_branch + num_originals, true);
     }
-#endif
 }
 
 static void patchOnNewProcess(patch_frame_context* frame, const dynlib_info* obj, const pid_t pid)
@@ -249,10 +247,7 @@ static void patchOnNewProcess(patch_frame_context* frame, const dynlib_info* obj
         }
         const size_t nbytes = sizeof(code_copy);
         userland_copyin(pid, code_copy, codebase, nbytes);
-        if (!is_ps4)
-        {
-            patchMountRoot(frame, obj, pid);
-        }
+        patchMountRoot(frame, obj, pid);
         frame->frame_start += nbytes;
         frame->frame_consumed += nbytes;
         frame->frame_size -= nbytes;
