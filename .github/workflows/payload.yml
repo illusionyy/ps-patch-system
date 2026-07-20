@@ -159,7 +159,7 @@ jobs:
           patch-server/usermode_prx_load.h
 
     - name: Upload patch-bundle-orbis
-      if: 0
+      if: github.event_name == 'pull_request'
       uses: actions/upload-artifact@main
       with:
         name: patch-bundle-orbis
@@ -167,7 +167,7 @@ jobs:
         archive: false
 
     - name: Upload patch-bundle-prospero
-      if: 0
+      if: github.event_name == 'pull_request'
       uses: actions/upload-artifact@main
       with:
         name: patch-bundle-prospero
