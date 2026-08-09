@@ -85,26 +85,49 @@ static void patchMountRoot(patch_frame_context* frame, const dynlib_info* obj, c
     uintptr_t timeout_branch = 0;
     uintptr_t target_branch = 0;
     char patch_buf[MAX_PATH + 1] = {};
-    const char* patten = "48 8d 35 ? ? ? ? 48 8d 15 ? ? ? ? 48 8d 0d ? ? ? ? 4c 8d 8d ? ? ? ? c7 85 ? ? ? ? ff ff ff ff 45 31 c0 c6 85 ? ? ? ? 00 e8 ? ? ? ?";
-    const size_t patten_offset = 48;
-    gen_backup_path(FUNC_N(0), patten, patten_offset, patch_buf, _countof_1(patch_buf));
     make_backup_buf(sfo_backup, 6);
-    const bool is_ptr = false;
-    if (restore_cached_backup(pid, mapbase, patch_buf, &sfo_backup, sizeof(sfo_backup), sizeof(sfo_backup.bytes), &timeout_branch, is_ptr) == 1)
+    static const struct pattern_entry patterns[] = {
+        {"48 8d 35 ? ? ? ? 48 8d 15 ? ? ? ? 48 8d 0d ? ? ? ? 4c 8d 8d ? ? ? ? c7 85 ? ? ? ? ff ff ff ff 45 31 c0 c6 85 ? ? ? ? 00 e8 ? ? ? ?", 48},  // 4.00 - 5.50, 9.00+
+        {"8d 35 ? ? ? ? 48 8d 15 ? ? ? ? 48 8d 0d ? ? ? ? 4c 8d 8d ? ? ? ? 45 31 c0 6a 00 53 e8 ? ? ? ?", 33},                                       // 6.xx
+        {"8d 35 ? ? ? ? 48 8d 15 ? ? ? ? 48 8d 0d ? ? ? ? 4c 8d 8d ? ? ? ? 45 31 c0 6a 00 48 8d 05 ? ? ? ? 50 e8 ? ? ? ?", 40},                      // 7.xx - 8.xx
+    };
+    const size_t pattern_count = _countof(patterns);
+    for (size_t idx = 0; idx < pattern_count; idx++)
     {
-        target_branch = timeout_branch;
-        debugf("timeout_branch cached %lx, target_branch from backup %lx\n", timeout_branch, target_branch);
-    }
-    else
-    {
-        timeout_branch = pid_chunk_scan(pid, mapbase, mapsize, patten, patten_offset);
-        debugf("timeout_branch: %lx\n", timeout_branch);
-        if (!timeout_branch)
+        const char* patten = patterns[idx].pattern;
+        const size_t patten_offset = patterns[idx].offset;
+        if (idx > 0)
         {
-            notify("can't find mount root nya");
-            return;
+            debugf("couldn't find mount root, trying (\"%s\" + %ld)!\n", patten, patten_offset);
+            memset(patch_buf, 0, sizeof(patch_buf));
+            memset(&sfo_backup, 0, sizeof(sfo_backup));
         }
-        target_branch = pid_read_call(pid, timeout_branch);
+        gen_backup_path(FUNC_N(0), patten, patten_offset, patch_buf, _countof_1(patch_buf));
+        const bool is_ptr = false;
+        if (restore_cached_backup(pid, mapbase, patch_buf, &sfo_backup, sizeof(sfo_backup), sizeof(sfo_backup.bytes), &timeout_branch, is_ptr) == 1)
+        {
+            target_branch = timeout_branch;
+            debugf("timeout_branch cached %lx, target_branch from backup %lx\n", timeout_branch, target_branch);
+        }
+        else
+        {
+            timeout_branch = pid_chunk_scan(pid, mapbase, mapsize, patten, patten_offset);
+            debugf("timeout_branch: %lx\n", timeout_branch);
+            if (timeout_branch)
+            {
+                target_branch = pid_read_call(pid, timeout_branch);
+            }
+        }
+        if (timeout_branch)
+        {
+            break;
+        }
+    }
+
+    if (!timeout_branch)
+    {
+        notify("can't find mount root nya");
+        return;
     }
 
     if (target_branch)
@@ -273,7 +296,8 @@ static void patchGetAppInfoSfo(patch_frame_context* frame, const dynlib_info* ob
     };
 
     static const struct pattern_entry ps5_patterns[] = {
-        {"e8 ? ? ? ? 48 8b 85 ? ? ? ? 4c 89 ? ? 89 ? 48 8b 70 10 e8 ? ? ? ?", 22},             // 4.00-8.00
+        {"e8 ? ? ? ? 48 8b 85 ? ? ? ? 4c 89 ? ? 89 ? 48 8b 70 10 e8 ? ? ? ?", 22},             // 4.00-6.00 & 8.00
+        {"49 8b 76 10 4c 89 ef 4c 89 e2 e8 ? ? ? ? 85 c0 0f 89", 10},                          // 7.00
         {"48 8b 85 ? ? ? ? 48 8d 75 ? 4c 89 ef 4c 89 ? 48 8b 50 10 e8 ? ? ? ? 41 89 ?", 21},   // 9.00+ - 10.00+
         {"49 8b 55 10 48 8b bd ? ? ? ? 48 8d 75 ? 4c 89 e1 e8 ? ? ? ? 41 89 c6", 18},          // 11.00+
         {"49 8b 55 10 48 8b bd ? ? ? ? 48 8b 8d ? ? ? ? 48 8d 75 ? e8 ? ? ? ? 41 89 c6", 22},  // 12.00+
@@ -309,7 +333,7 @@ static void patchGetAppInfoSfo(patch_frame_context* frame, const dynlib_info* ob
 
         if (call_to_getappinfo)
         {
-            is_new_fw_ps5 = idx > 0;
+            is_new_fw_ps5 = idx > 1;
             break;
         }
     }
