@@ -96,6 +96,7 @@ static int install_shortcut(const char* title_id, const char* url, const char* f
     snprintf_clear(d.json, _countof_1(d.json),
                    "{\n"
                    "    \"titleId\": \"%s\",\n"
+                   "    \"applicationCategoryType\": 65536,"
                    "    \"deeplinkUri\": \"%s\",\n"
                    "    \"localizedParameters\": {\n"
                    "        \"defaultLanguage\": \"en-US\",\n"
