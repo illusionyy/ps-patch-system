@@ -295,8 +295,10 @@ void run_elf_user_patch(client_data& read_client)
                     .metadata = meta,            //
                     .exec_name = mod_base        //
                 };
-                patch.read_xml();
-                run_prx_load_patch(read_client, id_hash);
+                if (patch.read_xml() >= 0)
+                {
+                    run_prx_load_patch(read_client, id_hash);
+                }
             }
         }
     }

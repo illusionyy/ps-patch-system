@@ -14,6 +14,7 @@
 #include <stdexcept>
 #include <cctype>
 #include <sstream>
+#include <limits>
 
 #include <string.h>
 
@@ -130,6 +131,37 @@ static uintptr_t check_mapbase(const uintptr_t mapbase)
     return !mapbase ? NO_ASLR_ADDR : mapbase;
 }
 
+static void checked_write(const patch_xml_context& ctx,
+                          const uintptr_t addr,
+                          const void* data,
+                          const size_t len)
+{
+    if (!data || !len)
+    {
+        throw std::invalid_argument(FILE_FUNC_LINE ": Invalid patch data");
+    }
+
+    const uintptr_t mapbase = check_mapbase(ctx.info.obj.mapbase);
+    const uintptr_t mapsize = (uintptr_t)ctx.info.obj.mapsize;
+    if (!mapsize || mapbase > std::numeric_limits<uintptr_t>::max() - mapsize)
+    {
+        throw std::out_of_range(FILE_FUNC_LINE ": Invalid executable module range");
+    }
+
+    const uintptr_t mapend = mapbase + mapsize;
+    if (addr < mapbase || addr >= mapend || len > mapend - addr)
+    {
+        throw std::out_of_range(FILE_FUNC_LINE ": Patch span is outside the executable module");
+    }
+
+    const int r = userland_copyin2(ctx.read_client.clientPid, addr, data, len);
+    if (r != 0)
+    {
+        throw std::runtime_error(std::string(FILE_FUNC_LINE ": userland_copyin2 failed with result ") +
+                                 std::to_string(r));
+    }
+}
+
 static uintptr_t scan_pattern(int pid, const dynlib_info& info, const char* pattern, size_t offset = 0)
 {
     return pid_chunk_scan(pid, check_mapbase(info.obj.mapbase), info.obj.mapsize, pattern, offset);
@@ -176,21 +208,21 @@ void patch_xml_context::apply_patch(const patch_line& pline)
         {
             const uintptr_t addr = resolve_addr(pline.address, info, pline.imagebase);
             const uint8_t v = (uint8_t)std::stoull(pline.value, nullptr, convertNumBase(pline.value));
-            userland_copyin2(pid, addr, &v, sizeof(v));
+            checked_write(*this, addr, &v, sizeof(v));
             break;
         }
         case sid("bytes16"):
         {
             const uintptr_t addr = resolve_addr(pline.address, info, pline.imagebase);
             const uint16_t v = (uint16_t)std::stoull(pline.value, nullptr, convertNumBase(pline.value));
-            userland_copyin2(pid, addr, &v, sizeof(v));
+            checked_write(*this, addr, &v, sizeof(v));
             break;
         }
         case sid("bytes32"):
         {
             const uintptr_t addr = resolve_addr(pline.address, info, pline.imagebase);
             const uint32_t v = (uint32_t)std::stoull(pline.value, nullptr, convertNumBase(pline.value));
-            userland_copyin2(pid, addr, &v, sizeof(v));
+            checked_write(*this, addr, &v, sizeof(v));
             break;
         }
         case sid("bytes64"):
@@ -198,7 +230,7 @@ void patch_xml_context::apply_patch(const patch_line& pline)
             const uintptr_t addr = resolve_addr(pline.address, info, pline.imagebase);
             const int nb = convertNumBase(pline.value);
             const auto v = nb == 16 ? std::stoull(pline.value, nullptr, nb) : std::stoll(pline.value, nullptr, nb);
-            userland_copyin2(pid, addr, &v, sizeof(v));
+            checked_write(*this, addr, &v, sizeof(v));
             break;
         }
 
@@ -206,14 +238,14 @@ void patch_xml_context::apply_patch(const patch_line& pline)
         {
             const uintptr_t addr = resolve_addr(pline.address, info, pline.imagebase);
             const float val = std::stof(pline.value);
-            userland_copyin2(pid, addr, &val, sizeof(val));
+            checked_write(*this, addr, &val, sizeof(val));
             break;
         }
         case sid("float64"):
         {
             const uintptr_t addr = resolve_addr(pline.address, info, pline.imagebase);
             const double val = std::stod(pline.value);
-            userland_copyin2(pid, addr, &val, sizeof(val));
+            checked_write(*this, addr, &val, sizeof(val));
             break;
         }
 
@@ -221,14 +253,14 @@ void patch_xml_context::apply_patch(const patch_line& pline)
         {
             const uintptr_t addr = resolve_addr(pline.address, info, pline.imagebase);
             const std::string s = unescape_utf8(pline.value);
-            userland_copyin2(pid, addr, s.data(), s.size());
+            checked_write(*this, addr, s.data(), s.size());
             break;
         }
         case sid("utf16"):
         {
             const uintptr_t addr = resolve_addr(pline.address, info, pline.imagebase);
             const std::wstring ws = unescape_utf16(pline.value);
-            userland_copyin2(pid, addr, ws.data(), ws.size() * sizeof(wchar_t));
+            checked_write(*this, addr, ws.data(), ws.size() * sizeof(wchar_t));
             break;
         }
 
@@ -236,7 +268,7 @@ void patch_xml_context::apply_patch(const patch_line& pline)
         {
             const uintptr_t addr = resolve_addr(pline.address, info, pline.imagebase);
             const auto payload = split_hex(pline.value);
-            userland_copyin2(pid, addr, payload.data(), payload.size());
+            checked_write(*this, addr, payload.data(), payload.size());
             break;
         }
         case sid("mask"):
@@ -250,7 +282,7 @@ void patch_xml_context::apply_patch(const patch_line& pline)
 
             const uintptr_t patch_addr = found + (offset < 0 ? offset : 0);
             const auto payload = split_hex(pline.value);
-            userland_copyin2(pid, patch_addr, payload.data(), payload.size());
+            checked_write(*this, patch_addr, payload.data(), payload.size());
             break;
         }
         case sid("mask_jump32"):
@@ -278,14 +310,14 @@ void patch_xml_context::apply_patch(const patch_line& pline)
 
             const auto cave_payload = split_hex(pline.value);
             const uintptr_t cave_end = cave_addr + cave_payload.size();
-            userland_copyin2(pid, cave_addr, cave_payload.data(), cave_payload.size());
+            checked_write(*this, cave_addr, cave_payload.data(), cave_payload.size());
 
             {
                 uint8_t jmp[5];
                 const int32_t rel = (int32_t)((intptr_t)(patch_addr + jump_size) - (intptr_t)(cave_end + 5));
                 jmp[0] = 0xE9;
                 std::memcpy(&jmp[1], &rel, 4);
-                userland_copyin2(pid, cave_end, jmp, sizeof(jmp));
+                checked_write(*this, cave_end, jmp, sizeof(jmp));
             }
 
             {
@@ -293,7 +325,7 @@ void patch_xml_context::apply_patch(const patch_line& pline)
                 const int32_t rel = (int32_t)((intptr_t)cave_addr - (intptr_t)(patch_addr + 5));
                 jmp_in[0] = 0xE9;
                 std::memcpy(&jmp_in[1], &rel, 4);
-                userland_copyin2(pid, patch_addr, jmp_in.data(), jmp_in.size());
+                checked_write(*this, patch_addr, jmp_in.data(), jmp_in.size());
             }
             break;
         }
@@ -534,7 +566,7 @@ int patch_xml_context::read_xml()
                     pline.address,
                     pline.value,
                     e.what());
-                continue;
+                return -1;
             }
         }
 
