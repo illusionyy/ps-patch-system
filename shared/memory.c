@@ -17,6 +17,9 @@
 #include "memory.h"
 
 #define BACKUP_VER 22761  // not random nya, 22761 does mean something.
+#define UPDATE_NUM (128 * 1024) // base num
+#define UPDATE_VER (UPDATE_NUM + 1) // version num, change to invalidate cache
+
 int sceKernelUsleep(int);
 
 uintptr_t pid_chunk_scan_data(const int pid, const uintptr_t mem_start, const uintptr_t mem_sz, const void* data, const size_t data_sz, const size_t pattern_offset)
@@ -218,7 +221,7 @@ void gen_backup_path(const char* file, const char* pattn, const size_t pattn_off
         static StringId bn = 0xff;
         bn = bn != 0xff ?: stringid_l("BACKUP_VER: " dstr(BACKUP_VER), -1);
         const StringId fn = stringid_l(pattn, -1) ^ stringid_l(file, -1) ^ bn;
-        snprintf(buf, len, BACKUP_DATA_PATCH_PATH "/fw_0x%08x_0x%08x_v%d.bin", fw, fn, BACKUP_VER);
+        snprintf(buf, len, BACKUP_DATA_PATCH_PATH "/fw_0x%08x_0x%08x_v%d_u%d.bin", fw, fn, BACKUP_VER, UPDATE_VER);
     }
 }
 
