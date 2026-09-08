@@ -292,7 +292,7 @@ static void patchGetAppInfoSfo(patch_frame_context* frame, const dynlib_info* ob
     make_backup_buf(sfo_backup, 5);
 
     static const struct pattern_entry ps4_patterns[] = {
-        {"49 8b 76 10 48 8b 55 a0 4c 89 ff e8 ? ? ? ? 85 c0", 11},
+        {"49 8b 76 10 48 8b 55 ? 4c 89 ff e8 ? ? ? ? 85 c0", 11},
     };
 
     static const struct pattern_entry ps5_patterns[] = {
