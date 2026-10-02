@@ -66,10 +66,14 @@ static uintptr_t get_ps5_attr()
         {
             return 0x26c;
         }
-        // 11.00 or newer
-        default:
+        case 0x1100 ... 0x1300:
         {
             return 0x1f4;
+        }
+        // 13.20 or newer
+        default:
+        {
+            return 0x214;
         }
     }
 }
