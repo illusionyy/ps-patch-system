@@ -18,6 +18,7 @@
 #include "../shared/file.h"
 
 #include <generated/icon0_png.inc.h>
+#include <generated/icon0_patch_png.inc.h>
 
 // must be in this order
 #pragma comment(lib, "SceIpmi")
@@ -50,7 +51,15 @@ static int install_file(const char* path, const void* data, const size_t size)
     return write_file(path, data, size);
 }
 
-static int install_shortcut(const char* title_id, const char* url, const char* friendly_name)
+typedef struct img_data
+{
+    const void* m_icon0;
+    const size_t m_icon0_len;
+    const void* m_pic0;
+    const size_t m_pic0_len;
+} img_data;
+
+static int install_shortcut(const char* title_id, const char* url, const char* friendly_name, const img_data* pImg)
 {
     struct d
     {
@@ -114,8 +123,15 @@ static int install_shortcut(const char* title_id, const char* url, const char* f
     {
         return -1;
     }
-    snprintf_clear(d.path, _countof_1(d.path), "/user/app/%s/sce_sys/icon0.png", title_id);
-    if (install_file(d.path, icon0_png_data, sizeof(icon0_png_data)))
+    if (pImg->m_icon0 && pImg->m_icon0_len)
+    {
+        snprintf_clear(d.path, _countof_1(d.path), "/user/app/%s/sce_sys/icon0.png", title_id);
+        if (install_file(d.path, pImg->m_icon0, pImg->m_icon0_len))
+        {
+            return -1;
+        }
+    }
+    if (pImg->m_pic0 && pImg->m_pic0_len)
     {
         return -1;
     }
@@ -128,5 +144,9 @@ static int install_shortcut(const char* title_id, const char* url, const char* f
 
 int install_launcher(void)
 {
-    return install_shortcut("ILNY26228", "http://127.0.0.1:" xstr(WEB_PORT), "Patch Manager");
+    const img_data icon = {
+        .m_icon0 = icon0_patch_png_data,
+        .m_icon0_len = sizeof(icon0_patch_png_data),
+    };
+    return install_shortcut("ILNY26228", "http://127.0.0.1:" xstr(WEB_PORT), "Patch Manager", &icon);
 }
