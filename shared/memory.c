@@ -16,9 +16,9 @@
 #include "../shared/stringid.h"
 #include "memory.h"
 
-#define BACKUP_VER 22761  // not random nya, 22761 does mean something.
-#define UPDATE_NUM (128 * 1024) // base num
-#define UPDATE_VER (UPDATE_NUM + 1) // version num, change to invalidate cache
+#define BACKUP_VER 22761             // not random nya, 22761 does mean something.
+#define UPDATE_NUM (128 * 1024)      // base num
+#define UPDATE_VER (UPDATE_NUM + 1)  // version num, change to invalidate cache
 
 int sceKernelUsleep(int);
 
