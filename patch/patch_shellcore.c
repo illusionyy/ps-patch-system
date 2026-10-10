@@ -145,6 +145,80 @@ static void patchMountRoot(patch_frame_context* frame, const dynlib_info* obj, c
     }
 }
 
+static void patchUpdateCheck(patch_frame_context* frame, const dynlib_info* obj, const pid_t pid)
+{
+#if defined(__PROSPERO__)
+    const uintptr_t mapbase = obj->obj.mapbase;
+    const size_t mapsize = obj->obj.mapsize;
+
+    uintptr_t timeout_branch = 0;
+    uintptr_t target_branch = 0;
+    bool new_fw = false;
+    char patch_buf[MAX_PATH + 1] = {};
+    make_backup_buf(sfo_backup, 6);
+    static const struct pattern_entry patterns[] = {
+        {"55 48 89 e5 41 57 41 56 41 55 41 54 53 48 83 ec ? 4c 8b 35 ? ? ? ? 4c 8d 2d ? ? ? ?"},             // 5.50
+        {"55 48 89 e5 41 57 41 56 41 55 41 54 53 48 83 ec ? 4c 8b 2d ? ? ? ? 48 89 55 ? 4c 8d 35 ? ? ? ?"},  // 11.60-13.60
+    };
+    const size_t pattern_count = _countof(patterns);
+    for (size_t idx = 0; idx < pattern_count; idx++)
+    {
+        const char* patten = patterns[idx].pattern;
+        const size_t patten_offset = patterns[idx].offset;
+        if (idx > 0)
+        {
+            debugf("couldn't find preLaunchCheck, trying (\"%s\" + %ld)!\n", patten, patten_offset);
+            memset(patch_buf, 0, sizeof(patch_buf));
+            memset(&sfo_backup, 0, sizeof(sfo_backup));
+        }
+        gen_backup_path(FUNC_N(0), patten, patten_offset, patch_buf, _countof_1(patch_buf));
+        const bool is_ptr = false;
+        if (restore_cached_backup(pid, mapbase, patch_buf, &sfo_backup, sizeof(sfo_backup), sizeof(sfo_backup.bytes), &timeout_branch, is_ptr) == 1)
+        {
+            target_branch = timeout_branch;
+            debugf("preLaunchCheck cached %lx, preLaunchCheck from backup %lx\n", timeout_branch, target_branch);
+        }
+        else
+        {
+            timeout_branch = pid_chunk_scan(pid, mapbase, mapsize, patten, patten_offset);
+            debugf("preLaunchCheck: %lx\n", timeout_branch);
+            if (timeout_branch)
+            {
+                target_branch = timeout_branch;
+            }
+        }
+        if (timeout_branch)
+        {
+            new_fw = idx > 0;
+            debugf("new_fw %d\n", new_fw);
+            break;
+        }
+    }
+
+    if (!timeout_branch)
+    {
+        notify("can't find preLaunchCheck nya, patching of pre launch softlock will not be possible.");
+        return;
+    }
+
+    if (target_branch)
+    {
+        if (file_exists(patch_buf) == FAILED)
+        {
+            debugf("cache file not exist %s\n", patch_buf);
+            userland_copyout(pid, target_branch, sfo_backup.bytes, sizeof(sfo_backup.bytes));
+            sfo_backup.addr = target_branch - mapbase;
+            write_backup_to_disk(patch_buf, &sfo_backup, sizeof(sfo_backup));
+        }
+        const size_t num_originals = sizeof(sfo_backup.bytes);
+        const uintptr_t target_fn = !new_fw ? __export_PS5_PreLaunchCheck1_offset : __export_PS5_PreLaunchCheck2_offset;
+        const uintptr_t replace_fn = !new_fw ? (__export_PreLaunchCheck1_offset + 1) : __export_PreLaunchCheck2_offset;
+        pid_write_call(pid, target_branch, frame->frame_base + target_fn, true);
+        pid_write_call(pid, frame->frame_base + (replace_fn + num_originals), target_branch + num_originals, true);
+    }
+#endif
+}
+
 static void patchOnNewProcess(patch_frame_context* frame, const dynlib_info* obj, const pid_t pid)
 {
     if (!is_ps4)
@@ -271,6 +345,7 @@ static void patchOnNewProcess(patch_frame_context* frame, const dynlib_info* obj
         const size_t nbytes = sizeof(code_copy);
         userland_copyin(pid, code_copy, codebase, nbytes);
         patchMountRoot(frame, obj, pid);
+        patchUpdateCheck(frame, obj, pid);
         frame->frame_start += nbytes;
         frame->frame_consumed += nbytes;
         frame->frame_size -= nbytes;

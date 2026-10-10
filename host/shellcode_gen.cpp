@@ -591,6 +591,17 @@ int3
 int3
 int3
 int3
+__export_PreLaunchCheck1:
+nop
+__export_PreLaunchCheck2:
+PUSH RBP
+MOV RBP,RSP
+PUSH R15
+int3
+int3
+int3
+int3
+int3
 )";
     try
     {

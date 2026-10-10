@@ -4,7 +4,12 @@
 #include <stdint.h>
 
 // exports
-extern "C" int __export_mount_root_original(void* pThis, const char* fs, const char* src, const char* dst, void* param_5, uint32_t* param_6);
+extern "C"
+{
+int __export_mount_root_original(void* pThis, const char* fs, const char* src, const char* dst, void* param_5, uint32_t* param_6);
+int __export_PreLaunchCheck1(const void* pThis, const uint64_t flags);
+int __export_PreLaunchCheck2(const void* pThis, const uint64_t flags, const void* param_3);
+}
 
 static bool valid_str(const char* p)
 {
@@ -57,4 +62,23 @@ extern "C" int __export_mount_root_hook(void* pThis, const char* fs, const char*
         debugf("mountUserData: 0x%08x\n", r);
     }
     return __export_mount_root_original(pThis, fs, src, dst, param_5, param_6);
+}
+
+extern "C"
+{
+int __export_PS5_PreLaunchCheck1(const void* pThis, const uint64_t flags)
+{
+    const uint64_t newCheckflags = flags | 1;
+    printf(FILE_FUNC_LINE ": (%p,%lx);", pThis, flags);
+    printf(" // updating checkFlags to 0x%lx\n", newCheckflags);
+    return __export_PreLaunchCheck1(pThis, newCheckflags);
+}
+
+int __export_PS5_PreLaunchCheck2(const void* pThis, const uint64_t flags, const void* param_3)
+{
+    const uint64_t newCheckflags = flags | 1;
+    printf(FILE_FUNC_LINE ": (%p,%lx,%p);", pThis, flags, param_3);
+    printf(" // updating checkFlags to 0x%lx\n", newCheckflags);
+    return __export_PreLaunchCheck2(pThis, newCheckflags, param_3);
+}
 }
