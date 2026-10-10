@@ -37,7 +37,7 @@ static unsigned long vmspace_pmap(unsigned long vmspace_kaddr)
             return vmspace_kaddr + 0x2C0;
         case 0x105 ... 0x550:
             return vmspace_kaddr + 0x2E0;
-        case 0x600 ... 0x1360:      // ← CHANGED: was 0x1340, now covers 13.42 and 13.60
+        case 0x600 ... 0x1360:  // ← CHANGED: was 0x1340, now covers 13.42 and 13.60
             return vmspace_kaddr + 0x2E8;
         default:
             return 0;
