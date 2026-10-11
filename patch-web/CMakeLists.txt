@@ -21,8 +21,13 @@ embed_files(${PROJECT_NAME}
     assets/roboto-v51-latin-regular.woff2
     assets/roboto-v51-latin-500.woff2
     assets/roboto-mono-v31-latin-regular.woff2
-    ../data/sce_sys/icon0.png
 )
+if(DEFINED PROSPERO)
+embed_files(${PROJECT_NAME}
+    ../data/sce_sys/icon0.png
+    ../data/sce_sys/icon0_patch.png
+)
+endif()
 
 include(optimization-settings)
 
